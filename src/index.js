@@ -1,3 +1,3 @@
 import Add from './helpers';
 
-console.log(Add(1000, 23));
+console.log(Add(10, 530));

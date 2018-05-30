@@ -35,7 +35,8 @@ var config = {
       }
     ]
   },
-  plugins: plugins
+  plugins: plugins,
+  watch: true,
 };
 
 module.exports = config;
