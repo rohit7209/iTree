@@ -8,95 +8,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-    crossorigin="anonymous">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous"> -->
 </head>
 
 <body>
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script> -->
 
 
   <div id="container">
 
   </div>
-
-
-
-
+  
   <script src="http://localhost:8080/iTree.js"></script>
+  <script src="http://localhost:8080/example/trees.js"></script>
+
   <!-- Optional JavaScript -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script>
+  <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script> -->
   <script>
     var container = document.getElementById('container');
-    var config = {
-      name: 'root',
-      className: 'root',
-      props: { width: '100px', height: '40px', background: 'red' },
-      children: [
-        {
-          name: 'child1',
-          className: 'children',
-          style: { width: '80px', height: '35px', background: 'green' },
-          children: [
-            {
-              name: 'child11',
-              className: 'children',
-              style: { width: '80px', height: '35px', background: 'green' },
-              children: `
-          <div>
-            <img src="http://via.placeholder.com/300x111" style="width:50px; height:35px">
-            <label>This is label</label>
-          </div>
-          `,
-            },
-            {
-              name: 'child12',
-              className: 'children',
-              style: { width: '80px', height: '35px', background: 'green' },
-              children: `
-          <div>
-            <img src="http://via.placeholder.com/300x112" style="width:50px; height:35px">
-            <label>This is label</label>
-          </div>
-          `,
-            },
-          ]
-        },
-        {
-          name: 'child2',
-          className: 'children',
-          style: { width: '80px', height: '35px', background: 'green' },
-          children: [
-            {
-              name: 'child21',
-              className: 'children',
-              style: { width: '80px', height: '35px', background: 'green' },
-              children: `
-          <div>
-            <img src="http://via.placeholder.com/300x200" style="width:50px; height:35px">
-            <label>This is label</label>
-          </div>
-          `,
-            },
-            {
-              name: 'child22',
-              className: 'children',
-              style: { width: '80px', height: '35px', background: 'green' },
-              children: `
-          <div>
-            <img src="http://via.placeholder.com/300x200" style="width:50px; height:35px">
-            <label>This is label</label>
-          </div>
-          `,
-            },
-          ]
-        },
-      ],
-    }
+    var config = tree1;
 
     var iTree = new iTree(container);
 

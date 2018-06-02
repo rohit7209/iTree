@@ -32,7 +32,11 @@ var config = {
         query: {
           presets: ["babel-preset-es2015"].map(require.resolve)
         }
-      }
+      },
+      {
+        test: /\.css$/,
+        loaders: ['style-loader', 'css-loader'],
+      },
     ]
   },
   plugins: plugins,

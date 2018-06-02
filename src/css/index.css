@@ -1,0 +1,26 @@
+._iTree_node{
+  width:100%;
+  text-align: center;
+  /* border:1px solid teal;   */
+}
+
+._iTree_hook{
+  margin:auto;
+  text-align: right;
+  display:flex;
+}
+
+._iTree_node-label{
+  /* border:1px solid red; */
+}
+
+._iTree_arrow-holder{
+  /*background: rgb(197, 192, 224);*/
+  text-align: center;
+}
+
+._iTree_children-list{
+  /* background: greenyellow; */
+  display: flex;
+  width:100%;
+}
