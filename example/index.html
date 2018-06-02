@@ -22,7 +22,11 @@
   <div id="container">
 
   </div>
-  
+
+  <div id="container_1">
+
+  </div>
+
   <script src="http://localhost:8080/iTree.js"></script>
   <script src="http://localhost:8080/example/trees.js"></script>
 
@@ -30,12 +34,35 @@
   <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
     crossorigin="anonymous"></script> -->
   <script>
+    //console.log(iTree, window);
+
     var container = document.getElementById('container');
-    var config = tree1;
+    var container1 = document.getElementById('container_1');
 
-    var iTree = new iTree(container);
+    var treeContainer = new iTree(container);
+    treeContainer.register({
+      nodeTemplate: {
+        template: `<div>rohit</div>`,
+        myFunction: (test) => { console.log(test) },
+        css: `.myClass{color:red; background:yellow}`,
+      },
+    });
+    // treeContainer.register({
+    //   nodeTemplate: {
+    //     temmplate: `<div>rohit</div>`,
+    //     myFunction: (test) => { console.log(test) },
+    //     css: `.myClass{color:red; background:yellow}`,
+    //   },
+    // });
+    treeContainer.draw(window.tree1, false);
 
-    iTree.draw(config);
+
+    var treeContainer1 = new iTree(container1);
+    treeContainer1.register({});
+    treeContainer1.register({});
+    treeContainer1.register({});
+    treeContainer1.register({});
+    treeContainer1.draw(window.tree2, false);
 
   </script>
 </body>

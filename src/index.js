@@ -1,110 +1,71 @@
-import Add from './helpers';
+'use strict';
+
 import './css/index.css';
+import { NODE_POSITION } from './helpers/constants';
+import Node from './node';
+import Store from './store';
 
-const creatChildrenList = () => {
-  const element = document.createElement('div');
-  element.setAttribute('class', '_iTree_children-list');
-  return element;
-}
-
-const createNodeLabel = () => {
-  const element = document.createElement('div');
-  element.setAttribute('class', '_iTree_node-label');
-  return element;
-}
-
-const createBody = () => {
-  const element = document.createElement('div');
-  element.setAttribute('class', '_iTree_node');
-  return element;
-}
-
-const createArrow = () => {
-  const element = document.createElement('div');
-  element.setAttribute('class', '_iTree_arrow-holder');
-  element.innerHTML = `<div style="margin:auto;width:2px; height:5px; background:black"></div>`;
-  return element;
-}
-
-const createHook = () => {
-  const element = document.createElement('div');
-  element.setAttribute('class', '_iTree_hook');
-  element.innerHTML = `
-  <div style="width:50%; height:5px; border-top:1px solid black; border-right:1px solid black"></div>
-  <div style="width:50%; height:5px; border-top:1px solid black; border-left:1px solid black"></div>
-  `;
-  return element;
-}
-
-const Node = function (props) {
-  const body = createBody();
-
-  const hook = createHook();
-  const nodeLabel = createNodeLabel();
-  const arrow = createArrow();
-  const childrenList = creatChildrenList();
-
-  this.addChild = (node) => {
-    childrenList.appendChild(node.getElement());
-  }
-
-  this.getElement = () => {
-    body.appendChild(hook);
-    body.appendChild(nodeLabel);
-    body.appendChild(arrow);
-    body.appendChild(childrenList);
-    return body;
-  }
-
-  this.addContent = (content) => {
-    nodeLabel.innerHTML = content;
-    nodeLabel.lastChild.style.marginLeft = 'auto';
-    nodeLabel.lastChild.style.marginRight = 'auto';
-  }
-}
-
-const addNext = (props) => {
-  const node = new Node(props);
+/**
+ * iterative function to add children in next level and so on
+ * @param {*} props properties of node (name, properties, className, children etc.)
+ * @param {*} position position of node to placed in the tree (first, last, middle or the only node)
+ */
+const addNext = (props, position) => {
+  const node = new Node(props, position);
   node.addContent(props.content);
   if (Array.isArray(props.children)) {
-    props.children.forEach((child) => {
-      node.addChild(addNext(child))
-    });
+    props.children.forEach((childProps, index) => {
+      let position;
+      if (index === 0) position = (props.children.length === 1) ? NODE_POSITION.ONLY : NODE_POSITION.FIRST;
+      else if (index === props.children.length - 1) position = NODE_POSITION.LAST;
+      else position = NODE_POSITION.MIDDLE;
+      node.addChild(addNext(childProps, position));
+    })
   }
-  return node;
+  return node
 }
 
-(() => {
+/**
+ * register entry function in window and instantiate a store for current object instance of iTree
+ * user can instantiate multiple objects of iTree and all have their own store
+ */
+((window) => {
   window.iTree = function (container) {
-    this.draw = (config) => {
+    /**
+     * 'store' manage (store and manipulate and provide) all the required information related to tree
+     */
+    const store = new Store();
 
-      const parent = addNext(config);
-
-      container.appendChild(parent.getElement());
-
+    /**
+     * it is the main function to draw tree in the provided container while instantiating this object
+     * the method will rewrite the container if called twice or more with different tree (json object)
+     * @param {*} tree json object for the tree to be drawn
+     */
+    this.draw = (tree) => {
+      store.register('tree', tree);
+      container.innerHTML = '';
+      container.appendChild(addNext(store.getTree(), NODE_POSITION.ROOT).getElement());
     };
+
+    /**
+     * registers the config
+     * it's compulsory to register configs before drawing
+     * we can register only once (multiple register not allowed)
+     * @param {*} registerConfigs configs to be registered
+     */
+    this.register = (registerConfigs) => {
+      if (!store.isRegistered())
+        Object.keys(registerConfigs).forEach(key => {
+          store.register(key, registerConfigs[key]);
+        });
+      else console.error('Registration after draw or Multiple registration not allowed!');
+      //console.log(store.getStore());
+    }
   }
-})()
+})(window)
 
-
-// const parentNode = new Node('parent');
-
-// const childNode1 = new Node();
-// const childNode2 = new Node();
-
-// const childNode11 = new Node();
-// const childNode12 = new Node();
-
-// const childNode21 = new Node();
-// const childNode22 = new Node();
-
-// childNode1.addChild(childNode11);
-// childNode1.addChild(childNode12);
-
-// childNode2.addChild(childNode21);
-// childNode2.addChild(childNode22);
-
-// parentNode.addChild(childNode1);
-// parentNode.addChild(childNode2);
-
-// console.log(parentNode.getElement());
+      // console.log('printing node info')
+      // console.log(store);
+      // console.log(store.getConfig());
+      // console.log(store.getTemplate());
+      // console.log(store.getTree());

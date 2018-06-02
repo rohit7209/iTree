@@ -8,6 +8,52 @@
   margin:auto;
   text-align: right;
   display:flex;
+  border:1px solid red;
+}
+
+._iTree_top-hook--left, ._iTree_top-hook--right, ._iTree_top-hook--middle{
+  margin:auto;
+  text-align: right;
+  display:flex;
+}
+._iTree_top-hook--only{
+  display: none;
+}
+
+._iTree_top-hook--left>div:first-child{
+  width:50%;
+  height:5px;
+}
+._iTree_top-hook--left>div:last-child{
+  width:50%;
+  height:5px;
+  border-top:1px solid black;
+  border-left:1px solid black;
+}
+
+._iTree_top-hook--right>div:first-child{
+  width:50%;
+  height:5px;
+  border-top:1px solid black;
+  border-right:1px solid black;
+}
+._iTree_top-hook--right>div:last-child{
+  width:50%;
+  height:5px;
+}
+
+._iTree_top-hook--middle>div:first-child{
+  width:50%;
+  height:5px;
+  border-top:1px solid black;
+  border-right:1px solid black;
+}
+
+._iTree_top-hook--middle>div:last-child{
+  width:50%;
+  height:5px;
+  border-top:1px solid black;
+  border-left:1px solid black;
 }
 
 ._iTree_node-label{

@@ -16,6 +16,7 @@ if (env === 'build') {
 }
 
 var config = {
+  mode:'none',
   context: __dirname + '/src', // `__dirname` is root of project and `src` is source
   entry: {
     app: './index.js',
@@ -36,6 +37,14 @@ var config = {
       {
         test: /\.css$/,
         loaders: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.js$/,
+        include: [
+          path.resolve(__dirname, '/src')
+        ],
+        loader: 'eslint',
+        exclude: /node_modules/
       },
     ]
   },
