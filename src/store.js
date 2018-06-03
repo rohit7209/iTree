@@ -1,45 +1,70 @@
-const Store = function Store() {
-  let tree = {};
-  let template = {};
-  let config = {};
-  let registered = false;
+import { getUniqueId } from './helpers/common';
+const Store = (() => {
 
-  this.getTree = () => {
-    return tree;
+  const nameList = [];
+
+  const registerName = (name) => {
+    if (nameList.includes(name)) registerName(name + getUniqueId());
+    else nameList.push(name);
+    return name;
   };
 
-  this.getTemplate = () => {
-    return template;
-  };
+  return function Store(storeName = getUniqueId()) {
+    const name = registerName(storeName);
+    let tree = {};
+    let template = {};
+    let config = {};
+    let registered = false;
 
-  this.getConfig = () => {
-    return config;
-  };
+    this.getTree = () => {
+      return tree;
+    };
 
-  this.isRegistered = () => {
-    return registered;
+    this.getTemplate = () => {
+      return template;
+    };
+
+    this.getConfig = () => {
+      console.log('return', config)
+      return config;
+    };
+
+    this.isRegistered = () => {
+      return registered;
+    };
+
+    this.getStore = () => {
+      return {
+        info: {
+          name
+        },
+        tree,
+        template,
+        config,
+        registered
+      };
+    };
+
+    this.register = (key, config) => {
+      registered = true;
+      switch (key) {
+        // jshint ignore:start
+        case 'tree':
+          tree = { ...config };
+          break;
+        case 'nodeTemplate':
+          template = { ...config };
+          break;
+        case 'config':
+          config = { ...config };
+          console.log(config);
+          break;
+        default:
+          console.error(`Invalide register key '${key}'`);
+        // jshint ignore:end
+      }
+    };
   }
-
-  this.getStore = () => {
-    return { tree, template, config, registered };
-  }
-
-  this.register = (key, config) => {
-    registered = true;
-    switch (key) {
-      case 'tree':
-        tree = { ...config };
-        break;
-      case 'nodeTemplate':
-        template = { ...config };
-        break;
-      case 'config':
-        config = { ...config };
-        break;
-      default:
-        console.error('Invalide register key');
-    }
-  };
-}
+})();
 
 export default Store;

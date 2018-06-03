@@ -1,5 +1,3 @@
-'use strict';
-
 import './css/index.css';
 import { NODE_POSITION } from './helpers/constants';
 import Node from './node';
@@ -10,19 +8,20 @@ import Store from './store';
  * @param {*} props properties of node (name, properties, className, children etc.)
  * @param {*} position position of node to placed in the tree (first, last, middle or the only node)
  */
-const addNext = (props, position) => {
-  const node = new Node(props, position);
-  node.addContent(props.content);
+const addNext = (props, position, store) => {
+  // console.log(store);
+  const node = new Node(props, position, store, this);
+  //node.addContent(props.content);
   if (Array.isArray(props.children)) {
     props.children.forEach((childProps, index) => {
       let position;
       if (index === 0) position = (props.children.length === 1) ? NODE_POSITION.ONLY : NODE_POSITION.FIRST;
       else if (index === props.children.length - 1) position = NODE_POSITION.LAST;
       else position = NODE_POSITION.MIDDLE;
-      node.addChild(addNext(childProps, position));
-    })
+      node.addChild(addNext(childProps, position, store));
+    });
   }
-  return node
+  return node;
 }
 
 /**
@@ -30,6 +29,7 @@ const addNext = (props, position) => {
  * user can instantiate multiple objects of iTree and all have their own store
  */
 ((window) => {
+  'use strict';
   window.iTree = function (container) {
     /**
      * 'store' manage (store and manipulate and provide) all the required information related to tree
@@ -43,8 +43,9 @@ const addNext = (props, position) => {
      */
     this.draw = (tree) => {
       store.register('tree', tree);
+      store.register('config', {text:'text'});
       container.innerHTML = '';
-      container.appendChild(addNext(store.getTree(), NODE_POSITION.ROOT).getElement());
+      container.appendChild(addNext(store.getTree(), NODE_POSITION.ROOT, store).getElement());
     };
 
     /**

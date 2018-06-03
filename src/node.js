@@ -1,7 +1,15 @@
+import {
+  creatChildrenList,
+  createBody,
+  createBottomHook,
+  createTopHook,
+  createNodeLabel
+} from './helpers/DOMHelpers';
 
-import { creatChildrenList, createBody, createBottomHook, createTopHook, createNodeLabel } from './helpers/DOMHelpers';
-
-export default Node = function (props, position) {
+export default Node = function (props, position, store, _this) {
+  console.log('store', store.getStore());
+  console.log('tree', store.isRegistered());
+  console.log('config', store.getConfig());
   const body = createBody();
 
   const nodeLabel = createNodeLabel();
@@ -9,7 +17,7 @@ export default Node = function (props, position) {
 
   this.addChild = (node) => {
     childrenList.appendChild(node.getElement());
-  }
+  };
 
   this.getElement = () => {
     body.appendChild(createTopHook(position));
@@ -17,11 +25,11 @@ export default Node = function (props, position) {
     (Array.isArray(props.children) && props.children.length > 0) ? body.appendChild(createBottomHook()) : null;
     body.appendChild(childrenList);
     return body;
-  }
+  };
 
   this.addContent = (content) => {
     nodeLabel.innerHTML = content;
     nodeLabel.lastChild.style.marginLeft = 'auto';
     nodeLabel.lastChild.style.marginRight = 'auto';
-  }
-}
+  };
+};
