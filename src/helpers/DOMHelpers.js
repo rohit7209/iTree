@@ -1,30 +1,55 @@
 
 import { NODE_POSITION } from './constants';
+import { trimInnerHTML } from './common';
 
 export const creatChildrenList = () => {
   const element = document.createElement('div');
   element.setAttribute('class', '_iTree_children-list');
   return element;
-}
+};
 
-export const createNodeLabel = () => {
+/**
+ * 
+ * @param {object || string} content //content of the label
+ * @param {object} store //store reference
+ */
+export const createNodeLabel = (content, store) => {
   const element = document.createElement('div');
   element.setAttribute('class', '_iTree_node-label');
+
+  // this block checks whether content is 'string' or object
+  if (typeof content === 'string') element.innerHTML = trimInnerHTML(content);
+  else if (typeof content === 'object') {
+    // if template is set by user in content object or pick default template from store (default template can be set by user by registering the store)
+    let label = content.template || store.getContent().template;
+    /*jshint ignore:start */
+    //get default values from store and update fields present in content values
+    const values = { ...store.getContent().defaultValues, ...(content.values || {}) };
+    /*jshint ignore:end */
+    // checks for each value of the content values and update the template with the values
+    Object.keys(values).forEach(key => {
+      label = label.replace(new RegExp(`{{${key}}}`, 'g'), values[key]);
+    });
+    element.innerHTML = trimInnerHTML(label);
+  }
+  //setting the margin of label to keep in center
+  element.lastChild.style.marginLeft = 'auto';
+  element.lastChild.style.marginRight = 'auto';
   return element;
-}
+};
 
 export const createBody = () => {
   const element = document.createElement('div');
   element.setAttribute('class', '_iTree_node');
   return element;
-}
+};
 
 export const createBottomHook = () => {
   const element = document.createElement('div');
   element.setAttribute('class', '_iTree_arrow-holder');
   element.innerHTML = `<div style="margin:auto;width:2px; height:5px; background:black"></div>`;
   return element;
-}
+};
 
 export const createTopHook = (position) => {
   let element;
@@ -44,4 +69,4 @@ export const createTopHook = (position) => {
   }
 
   return element;
-}
+};

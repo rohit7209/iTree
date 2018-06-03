@@ -10,13 +10,81 @@
   <!-- Bootstrap CSS -->
   <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
     crossorigin="anonymous"> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
 </head>
+
+<style>
+  td {
+    border: 2px solid #ff8000;
+    padding: 3px;
+    background: white;
+    text-align: center;
+  }
+
+  table {
+    width: 100%;
+    border: 2px solid #ff8000;
+    border-collapse: collapse;
+  }
+</style>
 
 <body>
   <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
     crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
     crossorigin="anonymous"></script> -->
+
+
+  <div style="width:200px;border:1px solid #ff8000; display:flex;">
+    <div style="width:80px; height:85px;text-align: center">
+      <img alt="profile" src="http://localhost:8080/example/img_avatar_her.png" style="margin:5px 15px;width:calc(100% - 34px); height:calc(100% - 39px); background:white; border-radius:100px;border:2px solid #ff8000"
+      />
+      <div style="text-transform:uppercase; color:#ff8000; font-size:8px;margin-top:-5px">
+        <span>Rohit Sharma</span>
+        <br>
+        <span style="font-size:7px;color:grey">JS developer</span>
+        <br/>
+        <div style="margin:2px auto;height:1px; background:#ff8000;width:30%"></div>
+      </div>
+    </div>
+    <div style="width:120px; height:85px; background:#ff8000;color:#ff8000;font-size:8px">
+      <div style="width:90px; height:65px; margin:3px 15px">
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                <i class="fa fa-phone" aria-hidden="true"></i>
+              </td>
+              <td>7278518017</td>
+            </tr>
+            <tr>
+              <td>
+                <i class="fa fa-globe" aria-hidden="true"></i>
+              </td>
+              <td>7278518017</td>
+            </tr>
+            <tr>
+              <td>
+                <i class="fa fa-envelope" aria-hidden="true"></i>
+              </td>
+              <td>7278518017</td>
+            </tr>
+            <tr>
+              <td style="background:transparent" colspan="2">
+                <div style="width:calc(100% + 8px);margin-left:-4px; height:1px; background:white"></div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <i class="fa fa-map-marker" aria-hidden="true"></i>
+              </td>
+              <td style="background:transparent;color:white">Kolkata, INDIA</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
 
   <div id="container">
@@ -35,35 +103,74 @@
     crossorigin="anonymous"></script> -->
   <script>
     //console.log(iTree, window);
+    var template = `<div style="width:200px; padding-left:5px; padding-right:5px">
+      <div style="width:200px;border:1px solid #ff8000; display:flex;">
+        <div style="width:80px; height:85px;text-align: center">
+          <img alt="profile" src="{{img}}"
+          style="margin:5px 15px;width:calc(100% - 34px); height:calc(100% - 39px); background:white; border-radius:100px;border:2px solid #ff8000"
+          />
+          <div style="text-transform:uppercase; color:#ff8000; font-size:8px;margin-top:-5px">
+            <span>{{name}}</span>
+            <br>
+            <span style="font-size:7px;color:grey">{{des}}</span>
+            <br/>
+            <div style="margin:2px auto;height:1px; background:#ff8000;width:30%"></div>
+          </div>
+        </div>
+        <div style="width:120px; height:85px; background:#ff8000;color:#ff8000;font-size:8px">
+          <div style="width:90px; height:65px; margin:3px 15px">
+            <table>
+              <tbody>
+                  <tr><td><i class="fa fa-phone" aria-hidden="true"></i></td><td>{{phone}}</td></tr>
+                  <tr><td><i class="fa fa-globe" aria-hidden="true"></i></td><td>{{website}}</td></tr>
+                  <tr><td><i class="fa fa-envelope" aria-hidden="true"></i></td><td>{{email}}</td></tr>
+                  <tr><td style="background:transparent" colspan="2"><div style="width:calc(100% + 8px);margin-left:-4px; height:1px; background:white"></div></td></tr>
+                  <tr><td><i class="fa fa-map-marker" aria-hidden="true"></i></td><td style="background:transparent;color:white">{{address}}</td></tr>
+              </tbody>
+            </table>
+          </div>      
+        </div>
+        </div>
+      </div>`;
 
     var container = document.getElementById('container');
     var container1 = document.getElementById('container_1');
 
     var treeContainer = new iTree(container);
     treeContainer.register({
-      nodeTemplate: {
-        template: `<div>rohit</div>`,
-        myFunction: (test) => { console.log(test) },
-        css: `.myClass{color:red; background:yellow}`,
+      content:{
+        template,
+        defaultValues:{
+          name:'john doe',
+          phone:'+1 7278518017',
+          des:'Developer',
+          email:'john@default.com',
+          website:'johndoedefault.xyz',
+          address:'CXTS, INDIA',
+          img:'http://via.placeholder.com/80x80',
+        }
       },
     });
-    // treeContainer.register({
-    //   nodeTemplate: {
-    //     temmplate: `<div>rohit</div>`,
-    //     myFunction: (test) => { console.log(test) },
-    //     css: `.myClass{color:red; background:yellow}`,
-    //   },
-    // });
     treeContainer.draw(window.tree1, false);
 
 
     var treeContainer1 = new iTree(container1);
-    // treeContainer1.register({});
-    // treeContainer1.register({});
-    // treeContainer1.register({});
-    // treeContainer1.register({});
     treeContainer1.draw(window.tree2, false);
 
+
+
+    // treeContainer1.register({});
+    // treeContainer1.register({});
+    // treeContainer1.register({});
+    // treeContainer1.register({});
+
+    // treeContainer.register({
+    //   nodeTemplate: {
+    //     template: `<div>rohit</div>`,
+    //     myFunction: (test) => { console.log(test) },
+    //     css: `.myClass{color:red; background:yellow}`,
+    //   },
+    // });
   </script>
 </body>
 

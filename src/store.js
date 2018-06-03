@@ -1,18 +1,26 @@
-import { getUniqueId } from './helpers/common';
+import { getUniqueId, trimInnerHTML } from './helpers/common';
+
 const Store = (() => {
-
   const nameList = [];
-
   const registerName = (name) => {
     if (nameList.includes(name)) registerName(name + getUniqueId());
     else nameList.push(name);
     return name;
   };
 
+  /**
+   * store constructor
+   * @param {string} storeName optional, used to set the name of store
+   */
   return function Store(storeName = getUniqueId()) {
     const name = registerName(storeName);
     let tree = {};
-    let template = {};
+    let content={
+      template : `<div style="width:30px;height:30px;border:1px solid black;border-radius:30px;overflow:hidden">
+        <img alt="iTree_logo" src="http://via.placeholder.com/30x30" />
+      </div>`,
+      defaultValues:{},
+    };
     let config = {};
     let registered = false;
 
@@ -20,12 +28,12 @@ const Store = (() => {
       return tree;
     };
 
-    this.getTemplate = () => {
-      return template;
+    this.getContent = () => {
+      return content;
     };
 
     this.getConfig = () => {
-      console.log('return', config)
+      //console.log('return', config)
       return config;
     };
 
@@ -39,32 +47,34 @@ const Store = (() => {
           name
         },
         tree,
-        template,
+        content,
         config,
         registered
       };
     };
 
-    this.register = (key, config) => {
-      registered = true;
-      switch (key) {
-        // jshint ignore:start
-        case 'tree':
-          tree = { ...config };
-          break;
-        case 'nodeTemplate':
-          template = { ...config };
-          break;
-        case 'config':
-          config = { ...config };
-          console.log(config);
-          break;
-        default:
-          console.error(`Invalide register key '${key}'`);
-        // jshint ignore:end
+    this.register = (key, value, update) => {
+      if (update && !registered) console.error(`Store[name='${name}'] is not registered with any config yet, you can't update store without registering it`);
+      else {
+        registered = true;
+        switch (key) {
+          // jshint ignore:start
+          case 'tree':
+            tree = (update) ? { ...tree, ...value } : { ...value };
+            break;
+          case 'content':
+            content = { ...content, ...value };
+            break;
+          case 'config':
+            config = (update) ? { ...config, ...value } : { ...value };
+            break;
+          default:
+            console.error(`Invalide register key '${key}'`);
+          // jshint ignore:end
+        }
       }
     };
-  }
+  };
 })();
 
 export default Store;

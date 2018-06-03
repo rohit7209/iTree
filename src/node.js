@@ -3,17 +3,15 @@ import {
   createBody,
   createBottomHook,
   createTopHook,
-  createNodeLabel
+  createNodeLabel,
 } from './helpers/DOMHelpers';
 
 export default Node = function (props, position, store, _this) {
-  console.log('store', store.getStore());
-  console.log('tree', store.isRegistered());
-  console.log('config', store.getConfig());
   const body = createBody();
-
-  const nodeLabel = createNodeLabel();
+  const nodeLabel = createNodeLabel(props.content || {}, store);
   const childrenList = creatChildrenList();
+
+  console.log('label', nodeLabel);
 
   this.addChild = (node) => {
     childrenList.appendChild(node.getElement());
@@ -22,7 +20,7 @@ export default Node = function (props, position, store, _this) {
   this.getElement = () => {
     body.appendChild(createTopHook(position));
     body.appendChild(nodeLabel);
-    (Array.isArray(props.children) && props.children.length > 0) ? body.appendChild(createBottomHook()) : null;
+    if (Array.isArray(props.children) && props.children.length > 0) body.appendChild(createBottomHook());
     body.appendChild(childrenList);
     return body;
   };

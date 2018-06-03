@@ -42,8 +42,7 @@ const addNext = (props, position, store) => {
      * @param {*} tree json object for the tree to be drawn
      */
     this.draw = (tree) => {
-      store.register('tree', tree);
-      store.register('config', {text:'text'});
+      store.register('tree', tree, false);
       container.innerHTML = '';
       container.appendChild(addNext(store.getTree(), NODE_POSITION.ROOT, store).getElement());
     };
@@ -61,9 +60,9 @@ const addNext = (props, position, store) => {
         });
       else console.error('Registration after draw or Multiple registration not allowed!');
       //console.log(store.getStore());
-    }
-  }
-})(window)
+    };
+  };
+})(window);
 
       // console.log('printing node info')
       // console.log(store);
