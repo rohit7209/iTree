@@ -11,7 +11,7 @@ export default Node = function (props, position, store, _this) {
   const nodeLabel = createNodeLabel(props.content || {}, store);
   const childrenList = creatChildrenList();
 
-  console.log('label', nodeLabel);
+  //console.log('label', nodeLabel);
 
   this.addChild = (node) => {
     childrenList.appendChild(node.getElement());

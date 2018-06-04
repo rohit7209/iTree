@@ -1,6 +1,8 @@
 
 import { NODE_POSITION } from './constants';
-import { trimInnerHTML } from './common';
+import { trimInnerHTML, getUniqueId } from './common';
+
+const popupStore = {};
 
 export const creatChildrenList = () => {
   const element = document.createElement('div');
@@ -8,10 +10,65 @@ export const creatChildrenList = () => {
   return element;
 };
 
+const createPopup = (store) => {
+  const popup = document.createElement('div');
+  popup.style.width = store.getPopupConfig().width + 'px';
+  popup.style.height = store.getPopupConfig().height + 'px';
+  popup.className = '_iTree_popup';
+  popup.innerHTML = `<div>I am ${getUniqueId('popup')}<div>`;
+  window.document.body.appendChild(popup);
+  return popup;
+};
+
+const showPopup = (element, store, event) => {
+  const popup = store.getPopup(element.popupId);
+
+  popup.style.display = '';
+
+  const popupWidth = store.getPopupConfig().width;
+  const popupHeight = store.getPopupConfig().height;
+
+  element.addEventListener('mousemove', (e) => {
+    console.log(innerWidth, innerHeight);
+
+    let top = e.clientY + 20;
+    let left = e.clientX - popupWidth / 2;
+    if (left < 0) left = 0;
+
+
+    if (innerWidth - left < popupWidth) left = innerWidth - popupWidth;
+    if (innerHeight - top < popupHeight) top = top - popupHeight - 20;
+
+    popup.style.top = top + 'px';
+    popup.style.left = left + 'px';
+  });
+};
+
+const hidePopup = (element, store) => {
+  element.removeEventListener('mousemove', e => { });
+  store.getPopup(element.popupId).style.display = 'none';
+};
+
+const addPopup = (element, store) => {
+  element.addEventListener("mouseover", function (event) {
+    if (!this.popupId) {
+      this.popupId = store.addPopup(createPopup(store));
+    }
+    showPopup(this, store, event);
+  }, false);
+  element.addEventListener("mouseout", function (event) {
+    const hoveredElement = document.elementFromPoint(event.clientX, event.clientY);
+    if (!this.contains(hoveredElement)) {
+      hidePopup(element, store);
+    }
+  }, false);
+};
+
 /**
- * 
+ * creates node and label for the node
  * @param {object || string} content //content of the label
  * @param {object} store //store reference
+ * @returns {DOM element} //node with label
  */
 export const createNodeLabel = (content, store) => {
   const element = document.createElement('div');
@@ -35,6 +92,7 @@ export const createNodeLabel = (content, store) => {
   //setting the margin of label to keep in center
   element.lastChild.style.marginLeft = 'auto';
   element.lastChild.style.marginRight = 'auto';
+  addPopup(element.lastChild, store);
   return element;
 };
 

@@ -28,7 +28,7 @@ window.tree4 = {
       ]
     }
   ]
-}
+};
 
 window.tree1 = {
   content: {

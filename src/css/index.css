@@ -1,3 +1,11 @@
+._iTree_popup{
+  position: fixed;
+  background: red;
+  color: white;
+  top:0px;
+  left:0px;
+}
+
 ._iTree_node{
   width:100%;
   text-align: center;

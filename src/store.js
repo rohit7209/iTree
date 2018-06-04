@@ -15,14 +15,43 @@ const Store = (() => {
   return function Store(storeName = getUniqueId()) {
     const name = registerName(storeName);
     let tree = {};
-    let content={
-      template : `<div style="width:30px;height:30px;border:1px solid black;border-radius:30px;overflow:hidden">
+    let content = {
+      template: `<div style="width:30px;height:30px;border:1px solid black;border-radius:30px;overflow:hidden">
         <img alt="iTree_logo" src="http://via.placeholder.com/30x30" />
       </div>`,
-      defaultValues:{},
+      defaultValues: {},
     };
     let config = {};
     let registered = false;
+
+    let popupConfig = {
+      height: 100,
+      width: 200,
+    };
+    const popupStore = {};
+
+    this.getPopupConfig = () => {
+      return popupConfig;
+    };
+
+    this.addPopup = (popup) => {
+      const id = getUniqueId('popup_');
+      popupStore[id] = popup;
+      return id;
+    };
+
+    this.getPopupStore = () => {
+      return popupStore;
+    };
+
+    this.getPopup = (id) => {
+      return popupStore[id];
+    };
+
+    this.removePopup = (id) => {
+      delete popupStore[id];
+      return true;
+    };
 
     this.getTree = () => {
       return tree;
@@ -68,6 +97,8 @@ const Store = (() => {
           case 'config':
             config = (update) ? { ...config, ...value } : { ...value };
             break;
+          case 'popupConfig':
+            popupConfig = (update) ? { ...popupConfig, ...value } : { ...value };
           default:
             console.error(`Invalide register key '${key}'`);
           // jshint ignore:end
