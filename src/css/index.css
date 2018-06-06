@@ -1,10 +1,39 @@
 ._iTree_popup{
   position: fixed;
-  background: red;
   color: white;
   top:0px;
   left:0px;
 }
+
+._iTree_popup-slide-top{
+  animation: 0.2s ease-out 0s 1 _iTree_popup-slide-top;
+}
+._iTree_popup-slide-bottom{
+  animation: 0.2s ease-out 0s 1 _iTree_popup-slide-bottom;
+}
+
+@keyframes _iTree_popup-slide-top {
+  0% {
+    transform: translateY(-20%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes _iTree_popup-slide-bottom {
+  0% {
+    transform: translateY(20%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 ._iTree_popup-pointer{
   position:absolute;
   border-style:solid;

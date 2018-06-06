@@ -2,9 +2,12 @@ import { getUniqueId, trimInnerHTML } from './helpers/common';
 
 const Store = (() => {
   const nameList = [];
+  let uId = 0;
   const registerName = (name) => {
-    if (nameList.includes(name)) registerName(name + getUniqueId());
-    else nameList.push(name);
+    while (nameList.includes(name)) {
+      name = getUniqueId(uId++);
+    }
+    nameList.push(name);
     return name;
   };
 
@@ -28,6 +31,8 @@ const Store = (() => {
       height: 100,
       width: 200,
       color: 'grey',
+      position: 'top',
+      template: `<div style="padding:5px; background:white"></div>`,
     };
     const popupStore = {};
 
@@ -36,7 +41,7 @@ const Store = (() => {
     };
 
     this.addPopup = (popup) => {
-      const id = getUniqueId('popup_');
+      const id = registerName(getUniqueId('popup_'));
       popupStore[id] = popup;
       return id;
     };
@@ -63,7 +68,6 @@ const Store = (() => {
     };
 
     this.getConfig = () => {
-      //console.log('return', config)
       return config;
     };
 
@@ -100,7 +104,7 @@ const Store = (() => {
             config = (update) ? { ...config, ...value } : { ...value };
             break;
           case 'popupConfig':
-            popupConfig = (update) ? { ...popupConfig, ...value } : { ...value };
+            popupConfig = { ...popupConfig, ...value };
             break;
           default:
             console.error(`Invalide register key '${key}'`);

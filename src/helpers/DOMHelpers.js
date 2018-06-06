@@ -28,7 +28,7 @@ export const creatChildrenList = () => {
   return element;
 };
 
-const createPopup = (store) => {
+const createPopup = (store, values) => {
   const popupConfig = store.getPopupConfig();
 
   const pointer = styled('div')({}, '_iTree_popup-pointer');
@@ -36,22 +36,25 @@ const createPopup = (store) => {
   const node = document.createElement('div');
   node.innerHTML = 'rohit';
 
+  // jshint ignore:start
   const popup = styled('div')({
     width: popupConfig.width + 'px',
     height: popupConfig.height + 'px',
     border: `1px solid ${popupConfig.color}`,
-  }, '_iTree_popup', node);
+    ...(popupConfig.style || {})
+  }, '_iTree_popup', buildContent(popupConfig.template, values));
+  // jshint ignore:end
 
   popup.appendChild(pointer);
-  return popup;
+  return store.addPopup(popup);
 };
 
-const showPopup = (element, store, event) => {
+const showPopup = (element, store) => {
   //getting popup from store
   const popup = store.getPopup(element.popupId);
   const pointer = popup.lastChild;
 
-  //adding popup to body to display it
+  // adding popup to body to display it
   window.document.body.appendChild(popup);
   const popupConfig = store.getPopupConfig();
   const popupWidth = popupConfig.width;
@@ -59,28 +62,32 @@ const showPopup = (element, store, event) => {
 
   element.addEventListener('mousemove', (e) => {
     // console.log(innerWidth, innerHeight);
-
+    
     let top = e.clientY + 25;
     let left = e.clientX - popupWidth / 2;
     let pointerTop = -16;
     let pointerBorderBottomColor = popupConfig.color;
     let pointerBorderTopColor = 'transparent';
+    let animationClass = '_iTree_popup-slide-bottom';
     if (left < 0) left = 0;
 
 
     if (innerWidth - left < popupWidth) left = innerWidth - popupWidth;
-    if (innerHeight - top < popupHeight) {
+    if (innerHeight - top < popupHeight || popupConfig.position === 'top') {
       //updating pointer styles
       pointerBorderBottomColor = 'transparent';
       pointerBorderTopColor = popupConfig.color;
       pointerTop = popupHeight;
       //updating popup style
       top = top - popupHeight - 45;
+      animationClass = '_iTree_popup-slide-top';
     }
 
     // updating popup styles
     popup.style.top = top + 'px';
     popup.style.left = left + 'px';
+    popup.className = '_iTree_popup ' + animationClass;
+    
     // these lines moves pointer of the popup to keep the pointer at cursor tip
     pointer.style.left = e.clientX - left - 7 + 'px';
     pointer.style.top = pointerTop + 'px';
@@ -96,10 +103,7 @@ const hidePopup = (element, store) => {
 
 const addPopup = (element, store) => {
   element.addEventListener("mouseover", function (event) {
-    if (!this.popupId) {
-      this.popupId = store.addPopup(createPopup(store));
-    }
-    showPopup(this, store, event);
+    showPopup(this, store);
   }, false);
   element.addEventListener("mouseout", function (event) {
     const hoveredElement = document.elementFromPoint(event.clientX, event.clientY);
@@ -138,11 +142,17 @@ export const createNodeLabel = (content, store) => {
     // checks for each value of the content values and update the template with the values
     label = buildContent(label, values);
     element.innerHTML = trimInnerHTML(label);
+
+    //adding popup to the element
+    //console.log(values);
+    element.lastChild.popupId = createPopup(store, values);
+    console.log('popId', element.lastChild.popupId);
+    addPopup(element.lastChild, store);
   }
   //setting the margin of label to keep in center
   element.lastChild.style.marginLeft = 'auto';
   element.lastChild.style.marginRight = 'auto';
-  addPopup(element.lastChild, store);
+
   return element;
 };
 

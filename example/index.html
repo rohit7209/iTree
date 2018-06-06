@@ -87,7 +87,7 @@
   </div>
 
 
-  <div id="container" style="margin-top:500px">
+  <div id="container" style="margin-top:600px">
 
   </div>
 
@@ -102,9 +102,9 @@
   <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
     crossorigin="anonymous"></script> -->
   <script>
-    //console.log(iTree, window);
-    var template = `<div style="width:200px; padding-left:5px; padding-right:5px">
-      <div style="width:200px;border:1px solid #ff8000; display:flex;">
+    //console.log(iTree, window);//padding-left:5px; padding-right:5px//border:1px solid #ff8000;
+    var template = `<div style="width:200px; ">
+      <div style="width:200px; display:flex;">
         <div style="width:80px; height:85px;text-align: center">
           <img alt="profile" src="{{img}}"
           style="margin:5px 15px;width:calc(100% - 34px); height:calc(100% - 39px); background:white; border-radius:100px;border:2px solid #ff8000"
@@ -139,7 +139,7 @@
     var treeContainer = new iTree(container);
     treeContainer.register({
       content: {
-        template,
+        template: `<div style="width:30px; height:30px; background:grey; border-radius:30px"></div>`,
         defaultValues: {
           name: 'john doe',
           phone: '+1 7278518017',
@@ -151,9 +151,12 @@
         }
       },
       popupConfig: {
-        height: 100,
-        width: 250,
-        color: '#276ab1',
+        width: 200,
+        height: 85,
+        color: '#ff8000',//'#276ab1',
+        style: { background: 'white' },
+        position:'bottom',//'top'
+        template,
       }
     });
     treeContainer.draw(window.tree1, false);
