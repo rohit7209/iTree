@@ -78,6 +78,7 @@ const Store = (() => {
         tree,
         content,
         config,
+        popupConfig,
         registered
       };
     };
@@ -99,6 +100,7 @@ const Store = (() => {
             break;
           case 'popupConfig':
             popupConfig = (update) ? { ...popupConfig, ...value } : { ...value };
+            break;
           default:
             console.error(`Invalide register key '${key}'`);
           // jshint ignore:end

@@ -138,18 +138,22 @@
 
     var treeContainer = new iTree(container);
     treeContainer.register({
-      content:{
+      content: {
         template,
-        defaultValues:{
-          name:'john doe',
-          phone:'+1 7278518017',
-          des:'Developer',
-          email:'john@default.com',
-          website:'johndoedefault.xyz',
-          address:'CXTS, INDIA',
-          img:'http://via.placeholder.com/80x80',
+        defaultValues: {
+          name: 'john doe',
+          phone: '+1 7278518017',
+          des: 'Developer',
+          email: 'john@default.com',
+          website: 'johndoedefault.xyz',
+          address: 'CXTS, INDIA',
+          img: 'http://via.placeholder.com/80x80',
         }
       },
+      popupConfig: {
+        height: 100,
+        width: 250,
+      }
     });
     treeContainer.draw(window.tree1, false);
 

@@ -10,12 +10,30 @@ export const creatChildrenList = () => {
   return element;
 };
 
+const createPointer = (width, height, clientX, clientY) => {
+
+  return pointer;
+};
+
 const createPopup = (store) => {
   const popup = document.createElement('div');
   popup.style.width = store.getPopupConfig().width + 'px';
   popup.style.height = store.getPopupConfig().height + 'px';
   popup.className = '_iTree_popup';
   popup.innerHTML = `<div>I am ${getUniqueId('popup')}<div>`;
+
+  //create pointer for popup
+  const html = `<div style="
+  position:absolute;
+  top:-16px;
+  left:0px;
+  border-style:solid;
+  border-color:transparent;
+  border-width:8px 7px;
+  border-bottom-color: red;
+  "></div>`;
+  const pointer = new DOMParser().parseFromString(html.trim(), 'text/html').body.childNodes[0];
+  popup.appendChild(pointer);
   window.document.body.appendChild(popup);
   return popup;
 };
@@ -31,7 +49,7 @@ const showPopup = (element, store, event) => {
   element.addEventListener('mousemove', (e) => {
     console.log(innerWidth, innerHeight);
 
-    let top = e.clientY + 20;
+    let top = e.clientY + 25;
     let left = e.clientX - popupWidth / 2;
     if (left < 0) left = 0;
 
@@ -41,6 +59,11 @@ const showPopup = (element, store, event) => {
 
     popup.style.top = top + 'px';
     popup.style.left = left + 'px';
+    // this line moves pointer of the popup to keep the pointer at cursor tip
+    //popup.appendChild(createPointer(popupWidth, popupHeight, e.clientX, e.clientY));
+    console.log(popup.lastChild.style.left);
+    popup.lastChild.style.left = e.clientX - left + 'px';
+
   });
 };
 
