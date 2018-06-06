@@ -5,6 +5,12 @@
   top:0px;
   left:0px;
 }
+._iTree_popup-pointer{
+  position:absolute;
+  border-style:solid;
+  border-color:transparent;
+  border-width:8px 7px;
+}
 
 ._iTree_node{
   width:100%;

@@ -2,7 +2,25 @@
 import { NODE_POSITION } from './constants';
 import { trimInnerHTML, getUniqueId } from './common';
 
-const popupStore = {};
+//function to create element and style it
+const styled = (tag) => {
+  const element = document.createElement(tag);
+  /**
+   * @param {object} style css in js styles for the element
+   * @param {string} className optional, class to be added in the element
+   */
+  return (style, className, child) => {
+    if (className) element.className = className;
+    if (style) Object.keys(style).forEach((key) => {
+      element.style[key] = style[key];
+    });
+    if (child) {
+      if (typeof child === 'string') element.innerHTML = child
+      else if (child instanceof HTMLElement) element.appendChild(child)
+    }
+    return element;
+  };
+};
 
 export const creatChildrenList = () => {
   const element = document.createElement('div');
@@ -10,66 +28,70 @@ export const creatChildrenList = () => {
   return element;
 };
 
-const createPointer = (width, height, clientX, clientY) => {
-
-  return pointer;
-};
-
 const createPopup = (store) => {
-  const popup = document.createElement('div');
-  popup.style.width = store.getPopupConfig().width + 'px';
-  popup.style.height = store.getPopupConfig().height + 'px';
-  popup.className = '_iTree_popup';
-  popup.innerHTML = `<div>I am ${getUniqueId('popup')}<div>`;
+  const popupConfig = store.getPopupConfig();
 
-  //create pointer for popup
-  const html = `<div style="
-  position:absolute;
-  top:-16px;
-  left:0px;
-  border-style:solid;
-  border-color:transparent;
-  border-width:8px 7px;
-  border-bottom-color: red;
-  "></div>`;
-  const pointer = new DOMParser().parseFromString(html.trim(), 'text/html').body.childNodes[0];
+  const pointer = styled('div')({}, '_iTree_popup-pointer');
+
+  const node = document.createElement('div');
+  node.innerHTML = 'rohit';
+
+  const popup = styled('div')({
+    width: popupConfig.width + 'px',
+    height: popupConfig.height + 'px',
+    border: `1px solid ${popupConfig.color}`,
+  }, '_iTree_popup', node);
+
   popup.appendChild(pointer);
-  window.document.body.appendChild(popup);
   return popup;
 };
 
 const showPopup = (element, store, event) => {
+  //getting popup from store
   const popup = store.getPopup(element.popupId);
+  const pointer = popup.lastChild;
 
-  popup.style.display = '';
-
-  const popupWidth = store.getPopupConfig().width;
-  const popupHeight = store.getPopupConfig().height;
+  //adding popup to body to display it
+  window.document.body.appendChild(popup);
+  const popupConfig = store.getPopupConfig();
+  const popupWidth = popupConfig.width;
+  const popupHeight = popupConfig.height;
 
   element.addEventListener('mousemove', (e) => {
-    console.log(innerWidth, innerHeight);
+    // console.log(innerWidth, innerHeight);
 
     let top = e.clientY + 25;
     let left = e.clientX - popupWidth / 2;
+    let pointerTop = -16;
+    let pointerBorderBottomColor = popupConfig.color;
+    let pointerBorderTopColor = 'transparent';
     if (left < 0) left = 0;
 
 
     if (innerWidth - left < popupWidth) left = innerWidth - popupWidth;
-    if (innerHeight - top < popupHeight) top = top - popupHeight - 20;
+    if (innerHeight - top < popupHeight) {
+      //updating pointer styles
+      pointerBorderBottomColor = 'transparent';
+      pointerBorderTopColor = popupConfig.color;
+      pointerTop = popupHeight;
+      //updating popup style
+      top = top - popupHeight - 45;
+    }
 
+    // updating popup styles
     popup.style.top = top + 'px';
     popup.style.left = left + 'px';
-    // this line moves pointer of the popup to keep the pointer at cursor tip
-    //popup.appendChild(createPointer(popupWidth, popupHeight, e.clientX, e.clientY));
-    console.log(popup.lastChild.style.left);
-    popup.lastChild.style.left = e.clientX - left + 'px';
-
+    // these lines moves pointer of the popup to keep the pointer at cursor tip
+    pointer.style.left = e.clientX - left - 7 + 'px';
+    pointer.style.top = pointerTop + 'px';
+    pointer.style['border-bottom-color'] = pointerBorderBottomColor;
+    pointer.style['border-top-color'] = pointerBorderTopColor;
   });
 };
 
 const hidePopup = (element, store) => {
   element.removeEventListener('mousemove', e => { });
-  store.getPopup(element.popupId).style.display = 'none';
+  window.document.body.removeChild(store.getPopup(element.popupId));
 };
 
 const addPopup = (element, store) => {
@@ -85,6 +107,13 @@ const addPopup = (element, store) => {
       hidePopup(element, store);
     }
   }, false);
+};
+
+const buildContent = (template, values) => {
+  Object.keys(values).forEach(key => {
+    template = template.replace(new RegExp(`{{${key}}}`, 'g'), values[key]);
+  });
+  return template;
 };
 
 /**
@@ -107,9 +136,7 @@ export const createNodeLabel = (content, store) => {
     const values = { ...store.getContent().defaultValues, ...(content.values || {}) };
     /*jshint ignore:end */
     // checks for each value of the content values and update the template with the values
-    Object.keys(values).forEach(key => {
-      label = label.replace(new RegExp(`{{${key}}}`, 'g'), values[key]);
-    });
+    label = buildContent(label, values);
     element.innerHTML = trimInnerHTML(label);
   }
   //setting the margin of label to keep in center

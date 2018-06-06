@@ -27,6 +27,7 @@ const Store = (() => {
     let popupConfig = {
       height: 100,
       width: 200,
+      color: 'grey',
     };
     const popupStore = {};
 
