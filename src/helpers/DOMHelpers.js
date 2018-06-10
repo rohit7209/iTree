@@ -1,6 +1,10 @@
 
 import { NODE_POSITION } from './constants';
-import { trimInnerHTML, getUniqueId } from './common';
+import {
+  trimInnerHTML,
+  getUniqueId,
+  camelToHyphenCase,
+} from './common';
 
 //function to create element and style it
 const styled = (tag) => {
@@ -9,15 +13,18 @@ const styled = (tag) => {
    * @param {object} style css in js styles for the element
    * @param {string} className optional, class to be added in the element
    */
-  return (style, className, child) => {
-    if (className) element.className = className;
-    if (style) Object.keys(style).forEach((key) => {
-      element.style[key] = style[key];
+  return (style, className, child, attributes) => {
+    if (typeof className === 'string') element.className = className;
+    if (typeof style === 'object') Object.keys(style).forEach((key) => {
+      element.style[camelToHyphenCase(key)] = style[key];
     });
     if (child) {
-      if (typeof child === 'string') element.innerHTML = child
-      else if (child instanceof HTMLElement) element.appendChild(child)
+      if (typeof child === 'string') element.innerHTML = child;
+      else if (child instanceof HTMLElement) element.appendChild(child);
     }
+    if (typeof attributes === 'object') Object.keys(attributes).forEach((key) => {
+      element.setAttribute(camelToHyphenCase(key), attributes[key]);
+    });
     return element;
   };
 };
@@ -62,7 +69,7 @@ const showPopup = (element, store) => {
 
   element.addEventListener('mousemove', (e) => {
     // console.log(innerWidth, innerHeight);
-    
+
     let top = e.clientY + 25;
     let left = e.clientX - popupWidth / 2;
     let pointerTop = -16;
@@ -87,7 +94,7 @@ const showPopup = (element, store) => {
     popup.style.top = top + 'px';
     popup.style.left = left + 'px';
     popup.className = '_iTree_popup ' + animationClass;
-    
+
     // these lines moves pointer of the popup to keep the pointer at cursor tip
     pointer.style.left = e.clientX - left - 7 + 'px';
     pointer.style.top = pointerTop + 'px';
@@ -144,10 +151,10 @@ export const createNodeLabel = (content, store) => {
     element.innerHTML = trimInnerHTML(label);
 
     //adding popup to the element
-    //console.log(values);
-    element.lastChild.popupId = createPopup(store, values);
-    console.log('popId', element.lastChild.popupId);
-    addPopup(element.lastChild, store);
+    if (store.getPopupConfig().showPopup) {
+      element.lastChild.popupId = createPopup(store, values);
+      addPopup(element.lastChild, store);
+    }
   }
   //setting the margin of label to keep in center
   element.lastChild.style.marginLeft = 'auto';
@@ -174,7 +181,6 @@ export const createTopHook = (position) => {
   if (position === NODE_POSITION.ROOT) {
     element = document.createElement('span');
   } else {
-
     let className;
     if (position === NODE_POSITION.FIRST) className = '_iTree_top-hook--left';
     else if (position === NODE_POSITION.LAST) className = '_iTree_top-hook--right';
@@ -187,4 +193,21 @@ export const createTopHook = (position) => {
   }
 
   return element;
+};
+
+export const createNodeTools = (id, store) => {
+  const tools = styled('span')();
+  const addBtn = styled('i')({}, 'fa fa-plus _iTree_tools-add', '', { title: 'add child', dataNodeId: id });
+  addBtn.addEventListener('click', (e) => {
+    store.addNodeChild({}, e.target.dataset.nodeId, true);
+  });
+  const removeBtn = styled('i')({}, 'fa fa-times _iTree_tools-remove', '', { title: 'remove from tree', dataNodeId: id });
+  removeBtn.addEventListener('click', (e) => {
+    const id = e.target.dataset.nodeId;
+    store.removeNodeChild(id, true);
+    console.log('remove clicked::', id);
+  });
+  tools.appendChild(addBtn);
+  tools.appendChild(removeBtn);
+  return styled('div')('', '_iTree_tools', tools);
 };

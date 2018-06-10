@@ -7,9 +7,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS -->
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-    crossorigin="anonymous"> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
 </head>
 
@@ -29,12 +26,6 @@
 </style>
 
 <body>
-  <!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-    crossorigin="anonymous"></script> -->
-
-
   <div style="width:200px;border:1px solid #ff8000; display:flex;">
     <div style="width:80px; height:85px;text-align: center">
       <img alt="profile" src="http://localhost:8080/example/img_avatar_her.png" style="margin:5px 15px;width:calc(100% - 34px); height:calc(100% - 39px); background:white; border-radius:100px;border:2px solid #ff8000"
@@ -87,7 +78,7 @@
   </div>
 
 
-  <div id="container" style="margin-top:600px">
+  <div id="container" style="margin-top:60px">
 
   </div>
 
@@ -97,10 +88,6 @@
 
   <script src="http://localhost:8080/iTree.js"></script>
   <script src="http://localhost:8080/example/trees.js"></script>
-
-  <!-- Optional JavaScript -->
-  <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-    crossorigin="anonymous"></script> -->
   <script>
     //console.log(iTree, window);//padding-left:5px; padding-right:5px//border:1px solid #ff8000;
     var template = `<div style="width:200px; ">
@@ -151,34 +138,20 @@
         }
       },
       popupConfig: {
-        width: 200,
-        height: 85,
         color: '#ff8000',//'#276ab1',
-        style: { background: 'white' },
-        position:'bottom',//'top'
+        width: '200px',
+        height: '85px',
+        style: {
+          background: 'white',
+        },
+        position: 'top',//'top'
         template,
       }
     });
-    treeContainer.draw(window.tree1, false);
+    treeContainer.draw(window.tree4, false);
 
-
-    var treeContainer1 = new iTree(container1);
-    treeContainer1.draw(window.tree2, false);
-
-
-
-    // treeContainer1.register({});
-    // treeContainer1.register({});
-    // treeContainer1.register({});
-    // treeContainer1.register({});
-
-    // treeContainer.register({
-    //   nodeTemplate: {
-    //     template: `<div>rohit</div>`,
-    //     myFunction: (test) => { console.log(test) },
-    //     css: `.myClass{color:red; background:yellow}`,
-    //   },
-    // });
+    // var treeContainer1 = new iTree(container1);
+    // treeContainer1.draw(window.tree4, false);
   </script>
 </body>
 

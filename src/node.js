@@ -4,25 +4,48 @@ import {
   createBottomHook,
   createTopHook,
   createNodeLabel,
+  createNodeTools,
 } from './helpers/DOMHelpers';
 
-export default Node = function (props, position, store, _this) {
-  const body = createBody();
+export default Node = function (props, id, store) {
+  const node = createBody();
   const nodeLabel = createNodeLabel(props.content || {}, store);
   const childrenList = creatChildrenList();
+  const tools = createNodeTools(id, store);
+  const classesToBeUpdated = [
+    '_iTree_top-hook--left',
+    '_iTree_top-hook--right',
+    '_iTree_top-hook--middle',
+    '_iTree_top-hook--only',
+    '_iTree_arrow-holder',
+  ];
 
   //console.log('label', nodeLabel);
 
-  this.addChild = (node) => {
-    childrenList.appendChild(node.getElement());
+  this.addChild = (node, position) => {
+    childrenList.appendChild(node.getElement(position));
   };
 
-  this.getElement = () => {
-    body.appendChild(createTopHook(position));
-    body.appendChild(nodeLabel);
-    if (Array.isArray(props.children) && props.children.length > 0) body.appendChild(createBottomHook());
-    body.appendChild(childrenList);
-    return body;
+  let topHook, bottomHook;
+  // assemble and return node element
+  this.getElement = (position) => {
+    // remove the children need to be uodated on every render
+    if (node.contains(topHook)) node.removeChild(topHook);
+    if (node.contains(bottomHook)) node.removeChild(bottomHook);
+    //adding top hook to the node
+    topHook = createTopHook(position);
+    node.appendChild(topHook);
+    //adding node label
+    node.appendChild(nodeLabel);
+    //adding tools to add child or remove the current node etc.
+    node.appendChild(tools);
+    // add bottom hook if node has child/children
+    bottomHook = createBottomHook();
+    if (store.getNodeParentMap()[id]) node.appendChild(bottomHook);
+    //appending children list to the node
+    node.appendChild(childrenList);
+    //returning node
+    return node;
   };
 
   this.addContent = (content) => {
@@ -31,3 +54,10 @@ export default Node = function (props, position, store, _this) {
     nodeLabel.lastChild.style.marginRight = 'auto';
   };
 };
+
+    // node.childNodes.forEach((element) => {
+    //   classesToBeUpdated.forEach((className) => {
+    //     if (element.classList.contains(className)) { node.removeChild(element); return false; }
+    //     else return true;
+    //   });
+    // });

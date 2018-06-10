@@ -1,4 +1,6 @@
 import { getUniqueId, trimInnerHTML } from './helpers/common';
+import { paint } from './index';
+import Node from './node';
 
 const Store = (() => {
   const nameList = [];
@@ -18,6 +20,7 @@ const Store = (() => {
   return function Store(storeName = getUniqueId()) {
     const name = registerName(storeName);
     let tree = {};
+    let container;
     let content = {
       template: `<div style="width:30px;height:30px;border:1px solid black;border-radius:30px;overflow:hidden">
         <img alt="iTree_logo" src="http://via.placeholder.com/30x30" />
@@ -36,45 +39,83 @@ const Store = (() => {
     };
     const popupStore = {};
 
+    let nodeMap = {};
+    let nodeParentMap = {};
+
+
+    const normalizeNode = (node, parent) => {
+      const id = this.addNodeChild(node, parent);
+      if (Array.isArray(node.children)) node.children.forEach((child) => {
+        normalizeNode(child, id);
+      });
+    };
+
+
+
+    this.repaint = () => {
+      paint(this);
+    };
+    this.addNodeChild = (node, parent, repaint) => {
+      const id = registerName(getUniqueId('nobj_'));
+      nodeMap[id] = { node: new Node(node, id, this), parent };
+      if (!nodeParentMap[parent]) nodeParentMap[parent] = [];
+      nodeParentMap[parent].push(id);
+      if (repaint) this.repaint();
+      return id;
+    };
+
+    const removeChildren = (parent) => {
+      delete nodeMap[parent];
+      console.log('list', nodeParentMap[parent]);
+      if (nodeParentMap[parent]) nodeParentMap[parent].forEach((child) => {
+        console.log('next', child);
+        removeChildren(child);
+      });
+      delete nodeParentMap[parent];
+    };
+
+    this.removeNodeChild = (id, repaint) => {
+      console.log('id', id);
+      const index = nodeParentMap[nodeMap[id].parent].indexOf(id);
+      if (index > -1) nodeParentMap[nodeMap[id].parent].splice(index);
+      removeChildren(id);
+      console.log('parent::', nodeParentMap);
+      console.log('node map', nodeMap);
+      if (repaint) this.repaint();
+    };
+    this.registerName = (name) => {
+      return registerName(name);
+    };
     this.getPopupConfig = () => {
       return popupConfig;
     };
-
     this.addPopup = (popup) => {
       const id = registerName(getUniqueId('popup_'));
       popupStore[id] = popup;
       return id;
     };
-
     this.getPopupStore = () => {
       return popupStore;
     };
-
     this.getPopup = (id) => {
       return popupStore[id];
     };
-
     this.removePopup = (id) => {
       delete popupStore[id];
       return true;
     };
-
     this.getTree = () => {
       return tree;
     };
-
     this.getContent = () => {
       return content;
     };
-
     this.getConfig = () => {
       return config;
     };
-
     this.isRegistered = () => {
       return registered;
     };
-
     this.getStore = () => {
       return {
         info: {
@@ -87,6 +128,15 @@ const Store = (() => {
         registered
       };
     };
+    this.getContainer = () => {
+      return container;
+    };
+    this.getNodeParentMap = () => {
+      return nodeParentMap;
+    };
+    this.getNodeMap = () => {
+      return nodeMap;
+    };
 
     this.register = (key, value, update) => {
       if (update && !registered) console.error(`Store[name='${name}'] is not registered with any config yet, you can't update store without registering it`);
@@ -95,8 +145,14 @@ const Store = (() => {
         switch (key) {
           // jshint ignore:start
           case 'tree':
-            tree = (update) ? { ...tree, ...value } : { ...value };
+            nodeMap = {};
+            nodeParentMap = {};
+            normalizeNode(value, 'root');
+            console.log('parentMap::', nodeParentMap);
+            console.log('nodeMap::', nodeMap);
             break;
+          case 'container':
+            container = value;
           case 'content':
             content = { ...content, ...value };
             break;
@@ -104,7 +160,15 @@ const Store = (() => {
             config = (update) ? { ...config, ...value } : { ...value };
             break;
           case 'popupConfig':
-            popupConfig = { ...popupConfig, ...value };
+            if (value.style) {
+              if (value.style.width) value.width = value.style.width;
+              if (value.style.height) value.height = value.style.height;
+              delete value.style.width;
+              delete value.style.height;
+            }
+            if (value.width) value.width = value.width.split('px')[0];
+            if (value.height) value.height = value.height.split('px')[0];
+            popupConfig = { ...popupConfig, ...value, showPopup: true };
             break;
           default:
             console.error(`Invalide register key '${key}'`);

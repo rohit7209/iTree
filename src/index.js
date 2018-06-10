@@ -4,24 +4,28 @@ import Node from './node';
 import Store from './store';
 
 /**
- * iterative function to add children in next level and so on
- * @param {*} props properties of node (name, properties, className, children etc.)
- * @param {*} position position of node to placed in the tree (first, last, middle or the only node)
+ * 
+ * @param {*} id 
+ * @param {*} store 
  */
-const addNext = (props, position, store) => {
-  // console.log(store);
-  const node = new Node(props, position, store, this);
-  //node.addContent(props.content);
-  if (Array.isArray(props.children)) {
-    props.children.forEach((childProps, index) => {
-      let position;
-      if (index === 0) position = (props.children.length === 1) ? NODE_POSITION.ONLY : NODE_POSITION.FIRST;
-      else if (index === props.children.length - 1) position = NODE_POSITION.LAST;
-      else position = NODE_POSITION.MIDDLE;
-      node.addChild(addNext(childProps, position, store));
-    });
-  }
+const renderNode = (id, store) => {
+  const node = store.getNodeMap()[id].node;
+  // console.log('node', node);
+  const childList = store.getNodeParentMap()[id];
+  if (childList) childList.forEach((childId, index) => {
+    let position;
+    if (id === 'root') position = NODE_POSITION.ROOT;
+    else if (index === 0) position = (childList.length === 1) ? NODE_POSITION.ONLY : NODE_POSITION.FIRST;
+    else if (index === childList.length - 1) position = NODE_POSITION.LAST;
+    else position = NODE_POSITION.MIDDLE;
+    node.addChild(renderNode(childId, store), position);
+  });
   return node;
+};
+
+export const paint = (store) => {
+  store.getContainer().innerHTML = '';
+  store.getContainer().appendChild((renderNode(store.getNodeParentMap().root[0], store).getElement()));
 }
 
 /**
@@ -43,8 +47,8 @@ const addNext = (props, position, store) => {
      */
     this.draw = (tree) => {
       store.register('tree', tree, false);
-      container.innerHTML = '';
-      container.appendChild(addNext(store.getTree(), NODE_POSITION.ROOT, store).getElement());
+      store.register('container', container, false);
+      paint(store);
     };
 
     /**
@@ -64,8 +68,21 @@ const addNext = (props, position, store) => {
   };
 })(window);
 
-      // console.log('printing node info')
-      // console.log(store);
-      // console.log(store.getConfig());
-      // console.log(store.getTemplate());
-      // console.log(store.getTree());
+/**
+ * 
+const addNext = (props, id, position, store) => {
+  const node = new Node(props, position, store, this);
+  //node.addContent(props.content);
+  if (typeof props.children === 'object') {
+    Object.keys(props.children).forEach((key, index) => {
+      let childProps = props.children[key];
+      let position;
+      if (index === 0) position = (Object.keys(props.children).length === 1) ? NODE_POSITION.ONLY : NODE_POSITION.FIRST;
+      else if (index === Object.keys(props.children).length - 1) position = NODE_POSITION.LAST;
+      else position = NODE_POSITION.MIDDLE;
+      node.addChild(addNext(childProps, key, position, store));
+    });
+  }
+  return node;
+};
+ */

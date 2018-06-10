@@ -30,6 +30,35 @@ window.tree4 = {
   ]
 };
 
+window.tree5 = {
+  id1: {
+    children: {
+      id2: {},
+      id3: {},
+      id4: {
+        children: [
+          {},
+          {
+            children: [
+              {}, {},
+              {
+                children: [
+                  {},
+                  {
+                    children: [
+                      {}, {}, {}, {}, {}
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+};
+
 window.tree1 = {
   content: {
     values: {
