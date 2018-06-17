@@ -197,7 +197,7 @@ export const createTopHook = (position) => {
 
 export const createNodeTools = (id, store) => {
   const tools = styled('span')();
-  const addBtn = styled('i')({}, 'fa fa-plus _iTree_tools-add', '', { title: 'add child', dataNodeId: id });
+  const addBtn = styled('i')({}, 'fa fa-plus _iTree_tools-add', '', { title: 'add child '+id, dataNodeId: id });
   addBtn.addEventListener('click', (e) => {
     store.addNodeChild({}, e.target.dataset.nodeId, true);
   });

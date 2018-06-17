@@ -39,7 +39,10 @@ const Store = (() => {
     };
     const popupStore = {};
 
+    // node details
     let nodeMap = {};
+
+    // child-parent relationship
     let nodeParentMap = {};
 
 
@@ -57,7 +60,7 @@ const Store = (() => {
     };
     this.addNodeChild = (node, parent, repaint) => {
       const id = registerName(getUniqueId('nobj_'));
-      nodeMap[id] = { node: new Node(node, id, this), parent };
+      nodeMap[id] = { node: node, parent };
       if (!nodeParentMap[parent]) nodeParentMap[parent] = [];
       nodeParentMap[parent].push(id);
       if (repaint) this.repaint();
@@ -66,21 +69,18 @@ const Store = (() => {
 
     const removeChildren = (parent) => {
       delete nodeMap[parent];
-      console.log('list', nodeParentMap[parent]);
       if (nodeParentMap[parent]) nodeParentMap[parent].forEach((child) => {
-        console.log('next', child);
         removeChildren(child);
       });
       delete nodeParentMap[parent];
     };
 
     this.removeNodeChild = (id, repaint) => {
-      console.log('id', id);
-      const index = nodeParentMap[nodeMap[id].parent].indexOf(id);
-      if (index > -1) nodeParentMap[nodeMap[id].parent].splice(index);
+      const parentId = nodeMap[id].parent;
+      const index = nodeParentMap[parentId].indexOf(id);
+      if (index > -1) nodeParentMap[parentId].splice(index, 1);
+      if (nodeParentMap[parentId].length === 0) delete nodeParentMap[parentId];
       removeChildren(id);
-      console.log('parent::', nodeParentMap);
-      console.log('node map', nodeMap);
       if (repaint) this.repaint();
     };
     this.registerName = (name) => {

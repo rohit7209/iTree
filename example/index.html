@@ -126,7 +126,7 @@
     var treeContainer = new iTree(container);
     treeContainer.register({
       content: {
-        template: `<div style="width:30px; height:30px; background:grey; border-radius:30px"></div>`,
+        template: `<div style="width:30px; height:30px; background:grey; border-radius:30px">{{t}}, {{x}}</div>`,
         defaultValues: {
           name: 'john doe',
           phone: '+1 7278518017',
@@ -135,6 +135,8 @@
           website: 'johndoedefault.xyz',
           address: 'CXTS, INDIA',
           img: 'http://via.placeholder.com/80x80',
+          t: (e) => { console.log(e); return 1 },
+          x: (e) => { console.log(e); return 2 },
         }
       },
       popupConfig: {

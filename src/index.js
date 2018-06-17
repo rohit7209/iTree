@@ -9,7 +9,7 @@ import Store from './store';
  * @param {*} store 
  */
 const renderNode = (id, store) => {
-  const node = store.getNodeMap()[id].node;
+  const node = new Node(store.getNodeMap()[id].node, id, store);
   // console.log('node', node);
   const childList = store.getNodeParentMap()[id];
   if (childList) childList.forEach((childId, index) => {
@@ -48,7 +48,7 @@ export const paint = (store) => {
     this.draw = (tree) => {
       store.register('tree', tree, false);
       store.register('container', container, false);
-      paint(store);
+      paint(store, true);
     };
 
     /**
