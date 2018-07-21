@@ -1,4 +1,4 @@
-import { getUniqueId, trimInnerHTML } from './helpers/common';
+import { getUniqueId, trimInnerHTML, beautifyTree } from './helpers/common';
 import { paint } from './index';
 import Node from './node';
 
@@ -19,6 +19,7 @@ const Store = (() => {
    */
   return function Store(storeName = getUniqueId()) {
     const name = registerName(storeName);
+    let clientNodeId = 0;
     let tree = {};
     let container;
     let content = {
@@ -45,7 +46,6 @@ const Store = (() => {
     // child-parent relationship
     let nodeParentMap = {};
 
-
     const normalizeNode = (node, parent) => {
       const id = this.addNodeChild(node, parent);
       if (Array.isArray(node.children)) node.children.forEach((child) => {
@@ -53,36 +53,70 @@ const Store = (() => {
       });
     };
 
-
-
     this.repaint = () => {
+      // clientNodeId=0;
       paint(this);
     };
+
+
+
+    this.updateNodeValues = (id, values) => {
+      nodeMap[id].node.content = { values };
+      this.repaint();
+    };
+
+    /**
+     * add a new node when requested  and repaints
+     * @param {*} node 
+     * @param {*} parent 
+     * @param {*} repaint 
+     */
     this.addNodeChild = (node, parent, repaint) => {
       const id = registerName(getUniqueId('nobj_'));
-      nodeMap[id] = { node: node, parent };
+      nodeMap[id] = { node: node, parent, id: ++clientNodeId };
       if (!nodeParentMap[parent]) nodeParentMap[parent] = [];
       nodeParentMap[parent].push(id);
       if (repaint) this.repaint();
+      // this.exportTree();
       return id;
     };
 
+    /**
+     * removes the node and its children and repaints
+     * @param {*} parent 
+     */
     const removeChildren = (parent) => {
       delete nodeMap[parent];
       if (nodeParentMap[parent]) nodeParentMap[parent].forEach((child) => {
         removeChildren(child);
       });
       delete nodeParentMap[parent];
+      this.exportTree();
     };
 
     this.removeNodeChild = (id, repaint) => {
-      const parentId = nodeMap[id].parent;
-      const index = nodeParentMap[parentId].indexOf(id);
-      if (index > -1) nodeParentMap[parentId].splice(index, 1);
-      if (nodeParentMap[parentId].length === 0) delete nodeParentMap[parentId];
-      removeChildren(id);
-      if (repaint) this.repaint();
+      const parentId = this.getParent(id);
+      if (parentId !== 'root') {
+        const index = nodeParentMap[parentId].indexOf(id);
+        if (index > -1) nodeParentMap[parentId].splice(index, 1);
+        if (nodeParentMap[parentId].length === 0) delete nodeParentMap[parentId];
+        removeChildren(id);
+        if (repaint) this.repaint();
+      } else {
+        console.error('You can\'t delete root node!');
+      }
     };
+
+
+    this.exportTree = () => {
+      // console.log('node_map', nodeMap);
+      // console.log('node_parent_map', nodeParentMap);
+      console.log(beautifyTree(nodeMap, nodeParentMap));
+    }
+
+    this.getParent = (id) => {
+      return nodeMap[id].parent;
+    }
     this.registerName = (name) => {
       return registerName(name);
     };
@@ -138,6 +172,11 @@ const Store = (() => {
       return nodeMap;
     };
 
+    this.getClientNodeId = (id) => {
+      // console.log('id:',clientNodeId, nodeMap);
+      return nodeMap[id].id;
+    };
+
     this.register = (key, value, update) => {
       if (update && !registered) console.error(`Store[name='${name}'] is not registered with any config yet, you can't update store without registering it`);
       else {
@@ -148,8 +187,9 @@ const Store = (() => {
             nodeMap = {};
             nodeParentMap = {};
             normalizeNode(value, 'root');
-            console.log('parentMap::', nodeParentMap);
-            console.log('nodeMap::', nodeMap);
+            // console.log('parentMap::', nodeParentMap);
+            // console.log('nodeMap::', nodeMap);
+            // console.log('val::', value);
             break;
           case 'container':
             container = value;

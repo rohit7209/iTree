@@ -1,26 +1,32 @@
 
-import { NODE_POSITION } from './constants';
+import { NODE_POSITION, ACTIONS, ICONS, FLAGS } from './constants';
 import {
   trimInnerHTML,
   getUniqueId,
   camelToHyphenCase,
 } from './common';
 
+
+
 //function to create element and style it
 const styled = (tag) => {
   const element = document.createElement(tag);
+  const appendChild = (element, child, append) => {
+    if (typeof child === 'string') if (append) element.innerHTML += child; else element.innerHTML = child;
+    else if (child instanceof HTMLElement) if (append) element.appendChild(child); else { element.innerHTML = ''; element.appendChild(child); }
+  };
   /**
    * @param {object} style css in js styles for the element
    * @param {string} className optional, class to be added in the element
    */
-  return (style, className, child, attributes) => {
+  return (child, className, attributes, style) => {
     if (typeof className === 'string') element.className = className;
     if (typeof style === 'object') Object.keys(style).forEach((key) => {
       element.style[camelToHyphenCase(key)] = style[key];
     });
     if (child) {
-      if (typeof child === 'string') element.innerHTML = child;
-      else if (child instanceof HTMLElement) element.appendChild(child);
+      if (Array.isArray(child)) child.forEach((item) => { appendChild(element, item, true); });
+      else appendChild(element, child);
     }
     if (typeof attributes === 'object') Object.keys(attributes).forEach((key) => {
       element.setAttribute(camelToHyphenCase(key), attributes[key]);
@@ -35,23 +41,19 @@ export const creatChildrenList = () => {
   return element;
 };
 
-const createPopup = (store, values) => {
+const createPopup = (store, values, id) => {
   const popupConfig = store.getPopupConfig();
 
-  const pointer = styled('div')({}, '_iTree_popup-pointer');
-
-  const node = document.createElement('div');
-  node.innerHTML = 'rohit';
-
   // jshint ignore:start
-  const popup = styled('div')({
+  const popup = styled('div')(buildContent(popupConfig.template, values, store, id), '_iTree_popup', {}, {
     width: popupConfig.width + 'px',
     height: popupConfig.height + 'px',
     border: `1px solid ${popupConfig.color}`,
     ...(popupConfig.style || {})
-  }, '_iTree_popup', buildContent(popupConfig.template, values));
+  });
   // jshint ignore:end
 
+  const pointer = styled('div')('', '_iTree_popup-pointer');
   popup.appendChild(pointer);
   return store.addPopup(popup);
 };
@@ -120,9 +122,9 @@ const addPopup = (element, store) => {
   }, false);
 };
 
-const buildContent = (template, values) => {
+const buildContent = (template, values, store, id) => {
   Object.keys(values).forEach(key => {
-    template = template.replace(new RegExp(`{{${key}}}`, 'g'), values[key]);
+    template = template.replace(new RegExp(`{{${key}}}`, 'g'), (typeof values[key] === "function" && values[key].name === "id") ? values[key](store.getClientNodeId(id)) : values[key]);
   });
   return template;
 };
@@ -133,9 +135,8 @@ const buildContent = (template, values) => {
  * @param {object} store //store reference
  * @returns {DOM element} //node with label
  */
-export const createNodeLabel = (content, store) => {
-  const element = document.createElement('div');
-  element.setAttribute('class', '_iTree_node-label');
+export const createNodeLabel = (content, store, id) => {
+  const element = styled('div')(null, '_iTree_node-label');
 
   // this block checks whether content is 'string' or object
   if (typeof content === 'string') element.innerHTML = trimInnerHTML(content);
@@ -147,18 +148,20 @@ export const createNodeLabel = (content, store) => {
     const values = { ...store.getContent().defaultValues, ...(content.values || {}) };
     /*jshint ignore:end */
     // checks for each value of the content values and update the template with the values
-    label = buildContent(label, values);
+    label = buildContent(label, values, store, id);
     element.innerHTML = trimInnerHTML(label);
 
     //adding popup to the element
     if (store.getPopupConfig().showPopup) {
-      element.lastChild.popupId = createPopup(store, values);
+      element.lastChild.popupId = createPopup(store, values, id);
       addPopup(element.lastChild, store);
     }
   }
   //setting the margin of label to keep in center
   element.lastChild.style.marginLeft = 'auto';
   element.lastChild.style.marginRight = 'auto';
+
+  element.lastChild.appendChild(createNodeTools(id, store));
 
   return element;
 };
@@ -191,23 +194,137 @@ export const createTopHook = (position) => {
     element.setAttribute('class', className);
     element.innerHTML = `<div></div><div></div>`;
   }
-
   return element;
 };
 
-export const createNodeTools = (id, store) => {
-  const tools = styled('span')();
-  const addBtn = styled('i')({}, 'fa fa-plus _iTree_tools-add', '', { title: 'add child '+id, dataNodeId: id });
-  addBtn.addEventListener('click', (e) => {
-    store.addNodeChild({}, e.target.dataset.nodeId, true);
+
+
+const confirm = (args) => {
+  const actionButtons = args.actions.map((action) => {
+    const btn = styled('button')(action[0], (action[2]) ? '_iTree_btn' : '_iTree_btn_alt');
+    btn.onclick = () => {
+      action[1]();
+      window.document.body.removeChild(confirmDialogue);
+    };
+    return btn;
   });
-  const removeBtn = styled('i')({}, 'fa fa-times _iTree_tools-remove', '', { title: 'remove from tree', dataNodeId: id });
+  const content = styled('div')([
+    styled('span')(ICONS.WARN, '_iTree_icon'),
+    '<br/>',
+    styled('span')(args.text),
+    '<br/>',
+    styled('div')(actionButtons, '_iTree_dialogue-actions'),
+  ], '_iTree_centerContent');
+  const dialogue = styled('div')(styled('div')(content, '_iTree_centerInner'), '_iTree_centerOuter _iTree_dialogue');
+  const confirmDialogue = styled('div')(styled('div')(styled('div')(dialogue, '_iTree_centerContent', { style: "text-align:center" }), '_iTree_centerInner'), '_iTree_centerOuter _iTree_confirm');
+  document.body.appendChild(confirmDialogue);
+};
+
+/**
+ * 
+ * @param {object} args 
+ */
+const collectInfo = (args) => {
+  const defaultValues = args.store.getContent().defaultValues;
+  const inputFields = {};
+  const allowedTypes = ["string", "number", "boolean"];
+
+  const values = args.purpose === FLAGS.UPDATE && args.store.getNodeMap()[args.id].node.content ? args.store.getNodeMap()[args.id].node.content.values : {};
+
+  Object.keys(defaultValues).forEach(key => {
+    if (allowedTypes.includes(typeof defaultValues[key])) {
+      const input = styled('input')(null, '_iTree_input_text', { id: `_iTree_input_${key}`, type: 'text', value: values[key] || '' });
+      inputFields[key] = input;
+    }
+  });
+
+  const actionButtons = args.actions.map((action) => {
+    const btn = styled('button')(action[0], (action[2]) ? '_iTree_btn' : '_iTree_btn_alt');
+    btn.onclick = () => {
+      const values = {};
+      Object.keys(inputFields).forEach(key => {
+        if (inputFields[key].value) values[key] = inputFields[key].value;
+      });
+      action[1](values);
+      window.document.body.removeChild(collectDialogue);
+    };
+    return btn;
+  });
+
+  const content = styled('div')([
+    styled('span')(args.purpose === FLAGS.UPDATE ? ICONS.EDIT : ICONS.ADD, '_iTree_icon'),
+    styled('div')(
+      Object.keys(inputFields).map(key => styled('div')([`${key}:<br/>`, inputFields[key]], '_iTree_input_field_container'))
+      , '_iTree_collect_info_body'),
+    styled('div')(actionButtons, '_iTree_dialogue-actions'),
+  ], '_iTree_centerContent');
+
+  const dialogue = styled('div')(styled('div')(content, '_iTree_centerInner'), '_iTree_centerOuter _iTree_dialogue');
+  const collectDialogue = styled('div')(styled('div')(styled('div')(dialogue, '_iTree_centerContent', { style: "text-align:center" }), '_iTree_centerInner'), '_iTree_centerOuter _iTree_confirm');
+
+  document.body.appendChild(collectDialogue);
+}
+
+export const createNodeTools = (id, store) => {
+  const tools = styled('span')(null, '');
+
+  // creating add button
+  const addBtn = styled('span')(ICONS.ADD, '_iTree_tools-add', { title: 'add child ' + id, dataNodeId: id });
+  addBtn.addEventListener('click', (e) => {
+    collectInfo({
+      purpose: FLAGS.ADD,
+      text: "We are adding a new node!",
+      actions: [
+        [ACTIONS.CANCEL, (e) => { }, false],
+        [ACTIONS.ADD, (values) => { store.addNodeChild({ content: { values } }, e.target.dataset.nodeId, true); }, true],
+      ],
+      store,
+      id,
+    });
+  });
+
+  //creating remove button
+  const removeBtn = styled('span')(ICONS.REMOVE, '_iTree_tools-remove', { title: 'remove from tree', dataNodeId: id });
   removeBtn.addEventListener('click', (e) => {
     const id = e.target.dataset.nodeId;
-    store.removeNodeChild(id, true);
-    console.log('remove clicked::', id);
+    // if (window.confirm("Are you sure, you want to delete all the children and the current node?")) {
+    if (store.getParent(id) !== 'root') confirm({
+      text: "Are you sure you want to delete node and its children?",
+      actions: [
+        [ACTIONS.CANCEL, (e) => { }, false],
+        [ACTIONS.REMOVE, (e) => {
+          store.removeNodeChild(id, true);
+        }, true],
+      ],
+    });
+    else confirm({
+      text: "You can't delete root node!",
+      actions: [
+        [ACTIONS.OK, (e) => { }, true],
+      ],
+    });
   });
+
+
+  //creating edit button
+  const editBtn = styled('span')(ICONS.EDIT, '_iTree_tools-edit', { title: 'edit node values', dataNodeId: id });
+  editBtn.addEventListener('click', (e) => {
+    collectInfo({
+      purpose: FLAGS.UPDATE,
+      text: "Editing the node!",
+      actions: [
+        [ACTIONS.CANCEL, (e) => { }, false],
+        [ACTIONS.UPDATE, (values) => { store.updateNodeValues(id, values); }, true],
+      ],
+      store,
+      id,
+    });
+  });
+
+  // appending buttons to tools
   tools.appendChild(addBtn);
+  tools.appendChild(editBtn);
   tools.appendChild(removeBtn);
-  return styled('div')('', '_iTree_tools', tools);
+
+  return styled('div')(tools, '_iTree_tools');
 };

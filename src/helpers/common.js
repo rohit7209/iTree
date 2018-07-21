@@ -8,6 +8,25 @@ export const trimInnerHTML = (content) => {
 
 export const camelToHyphenCase = (text) => {
   if (typeof text === 'string') {
-    return text.replace( /([a-z])([A-Z])/g, '$1-$2' ).toLowerCase();
+    return text.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
   } else return;
 };
+
+
+export const beautifyTree = (nodeMap, nodeParentMap) => {
+
+  const addToTree = (tree, node) => {
+    if (nodeMap[node].node.content) tree.values = nodeMap[node].node.content.values || {};
+    (nodeParentMap[node] || []).forEach(item => {
+      if (!tree.children) tree.children = [];
+      tree.children.push(addToTree({}, item));
+    });
+    return tree;
+  };
+
+  const tree = addToTree({}, nodeParentMap.root[0]);
+
+  console.log('tree::', tree);
+
+  return tree;
+}

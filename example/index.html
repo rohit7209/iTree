@@ -78,7 +78,7 @@
   </div>
 
 
-  <div id="container" style="margin-top:60px">
+  <div id="container" style="margin-top:60px; overflow:scroll">
 
   </div>
 
@@ -90,7 +90,7 @@
   <script src="http://localhost:8080/example/trees.js"></script>
   <script>
     //console.log(iTree, window);//padding-left:5px; padding-right:5px//border:1px solid #ff8000;
-    var template = `<div style="width:200px; ">
+    var popupTemplate = `<div style="width:200px; ">
       <div style="width:200px; display:flex;">
         <div style="width:80px; height:85px;text-align: center">
           <img alt="profile" src="{{img}}"
@@ -112,7 +112,7 @@
                   <tr><td><i class="fa fa-globe" aria-hidden="true"></i></td><td>{{website}}</td></tr>
                   <tr><td><i class="fa fa-envelope" aria-hidden="true"></i></td><td>{{email}}</td></tr>
                   <tr><td style="background:transparent" colspan="2"><div style="width:calc(100% + 8px);margin-left:-4px; height:1px; background:white"></div></td></tr>
-                  <tr><td><i class="fa fa-map-marker" aria-hidden="true"></i></td><td style="background:transparent;color:white">{{address}}</td></tr>
+                  <tr><td><i class="fa fa-map-marker" aria-hidden="true">{{id}}</i></td><td style="background:transparent;color:white">{{address}}</td></tr>
               </tbody>
             </table>
           </div>      
@@ -123,10 +123,12 @@
     var container = document.getElementById('container');
     var container1 = document.getElementById('container_1');
 
+    var id = 1;
+
     var treeContainer = new iTree(container);
     treeContainer.register({
       content: {
-        template: `<div style="width:30px; height:30px; background:grey; border-radius:30px">{{t}}, {{x}}</div>`,
+        template: `<div style="width:80px; height:80px; background:grey; border-radius:85px"><img src="{{img}}" style="width:100%"/></div>`,
         defaultValues: {
           name: 'john doe',
           phone: '+1 7278518017',
@@ -135,8 +137,8 @@
           website: 'johndoedefault.xyz',
           address: 'CXTS, INDIA',
           img: 'http://via.placeholder.com/80x80',
-          t: (e) => { console.log(e); return 1 },
-          x: (e) => { console.log(e); return 2 },
+          t: (e) => 'id:',
+          id: (id) => id,
         }
       },
       popupConfig: {
@@ -147,13 +149,14 @@
           background: 'white',
         },
         position: 'top',//'top'
-        template,
+        template: popupTemplate,
       }
     });
     treeContainer.draw(window.tree4, false);
 
     // var treeContainer1 = new iTree(container1);
     // treeContainer1.draw(window.tree4, false);
+    new iTree(container1).draw(window.tree4, false);
   </script>
 </body>
 

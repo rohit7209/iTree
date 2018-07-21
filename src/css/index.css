@@ -1,15 +1,37 @@
 ._iTree_tools{
-  font-size: 8px;
+  font-size: 12px;
   font-weight: lighter;
-  cursor: pointer;
-  color:lightgrey;
+  color:rgb(200,200,200);
+  font-weight: bold;
+  background: rgba(0,0,0,0.5);
+  position: absolute !important;
+  width: 100%;
+  display: none;
+  bottom: 0;
 }
-._iTree_tools>i{
+
+._iTree_node-label *:hover ._iTree_tools { display: block; }
+
+._iTree_node-label *{
+  position: relative;
+  overflow: hidden;
+}
+
+._iTree_tools>span{
   padding:0px 1px;
+}
+
+._iTree_tools-add, ._iTree_tools-edit, ._iTree_tools-remove{
+  transform: scaleX(-1);
+  padding:0px 1px;
+  cursor:pointer;
 }
 
 ._iTree_tools-add:hover{
   color:#008ecc;/* color:#9dc183; */
+}
+._iTree_tools-edit:hover{
+  color:#008ecc;
 }
 ._iTree_tools-remove:hover{
   color:#d21f3c;
@@ -72,6 +94,7 @@
 ._iTree_node{
   width:100%;
   text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   /* border:1px solid teal;   */
 }
 
@@ -140,4 +163,109 @@
   /* background: greenyellow; */
   display: flex;
   width:100%;
+}
+
+._iTree_centerOuter{
+  display:table;
+  table-layout:fixed;
+}
+
+._iTree_centerInner{
+  display:table-cell; 
+  vertical-align:middle;
+}
+
+.iTree_centerContent{
+  margin:0 auto;
+}
+
+._iTree_icon{
+  color:rgb(55, 150, 198);
+  font-weight: bold;
+  font-size: 22px;
+}
+
+._iTree_dialogue{
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 13px;
+  margin:auto;
+  width:300px; 
+  min-height:100px;
+  background:white; 
+  color:black; 
+  border:1px solid rgb(55, 150, 198);
+  text-align:left;
+  padding:10px;
+  animation: 0.3s ease-out 0s 1 _iTree_popup_animation;
+}
+._iTree_dialogue-actions{
+  text-align: right;
+}
+
+@keyframes _iTree_popup_animation {
+  0% {
+    transform: scale(0.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+header {  
+  /* This section calls the slideInFromLeft animation we defined above */
+  animation: 1s ease-out 0s 1 slideInFromLeft;
+  
+  background: #333;
+  padding: 30px;
+}
+
+
+._iTree_btn, ._iTree_btn_alt{
+  min-width:50px; 
+  padding:5px;
+  border:1px solid rgb(55, 150, 198);
+  background:rgb(55, 150, 198);
+  border-radius:3px;
+  color:white;
+  margin:5px;
+  cursor: pointer;
+}
+._iTree_btn_alt{
+  background: white;
+  color:rgb(55, 150, 198);
+}
+
+._iTree_confirm{
+  background: rgba(0,0,0,0.6);
+  color: white;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 100;
+}
+
+._iTree_input_field_container{
+  width:calc(50% - 12px);
+  height:30px; 
+  padding:5px;
+  font-size: 10px;
+  color:rgb(55, 150, 198);
+}
+
+._iTree_input_text{
+  width:calc(100% - 5px);
+  border:none;
+  border-bottom: 1px solid rgb(200,200,200);
+}
+
+._iTree_input_text:focus{
+  outline: none;
+  border-bottom: 1px solid rgb(55, 150, 198);
+}
+
+._iTree_collect_info_body{
+  display:flex; 
+  flex-wrap:wrap;
 }

@@ -6,7 +6,19 @@ var content = `
 
 window.tree4 = {
   children: [
-    {}, {},
+    {
+      content: {
+        values: {
+          name: 'rohit sharma',
+          phone: '+91 7278518017',
+          des: 'JS Developer',
+          email: 'rohit@xyz.com',
+          website: 'rohitsharma.xyz',
+          address: 'Kolkata, INDIA',
+          img: 'http://localhost:8080/example/img_avatar_her.png',
+        }
+      },
+    }, {},
     {
       children: [
         {},
