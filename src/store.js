@@ -22,11 +22,13 @@ const Store = (() => {
     let clientNodeId = 0;
     let tree = {};
     let container;
+    let onChange;
+    let editable = false;
     let content = {
-      template: `<div style="width:30px;height:30px;border:1px solid black;border-radius:30px;overflow:hidden">
-        <img alt="iTree_logo" src="http://via.placeholder.com/30x30" />
-      </div>`,
-      defaultValues: {},
+      template: `<div class="_iTree_default_node">{{id}}</div>`,
+      defaultValues: {
+        id: (id) => id,
+      },
     };
     let config = {};
     let registered = false;
@@ -77,7 +79,6 @@ const Store = (() => {
       if (!nodeParentMap[parent]) nodeParentMap[parent] = [];
       nodeParentMap[parent].push(id);
       if (repaint) this.repaint();
-      // this.exportTree();
       return id;
     };
 
@@ -91,7 +92,6 @@ const Store = (() => {
         removeChildren(child);
       });
       delete nodeParentMap[parent];
-      this.exportTree();
     };
 
     this.removeNodeChild = (id, repaint) => {
@@ -109,9 +109,8 @@ const Store = (() => {
 
 
     this.exportTree = () => {
-      // console.log('node_map', nodeMap);
-      // console.log('node_parent_map', nodeParentMap);
-      console.log(beautifyTree(nodeMap, nodeParentMap));
+      if (typeof onChange === "function") onChange(beautifyTree(nodeMap, nodeParentMap));
+      else console.error('Error:', 'onChange is not registered or its not a function.');
     }
 
     this.getParent = (id) => {
@@ -183,12 +182,15 @@ const Store = (() => {
         registered = true;
         switch (key) {
           // jshint ignore:start
+          case 'editable':
+            this.editable = value;
+            break;
           case 'tree':
             nodeMap = {};
             nodeParentMap = {};
             normalizeNode(value, 'root');
-            // console.log('parentMap::', nodeParentMap);
-            // console.log('nodeMap::', nodeMap);
+            // console.log('parentMap::', JSON.stringify(nodeParentMap));
+            // console.log('nodeMap::', JSON.stringify(nodeMap));
             // console.log('val::', value);
             break;
           case 'container':
@@ -209,6 +211,9 @@ const Store = (() => {
             if (value.width) value.width = value.width.split('px')[0];
             if (value.height) value.height = value.height.split('px')[0];
             popupConfig = { ...popupConfig, ...value, showPopup: true };
+            break;
+          case 'onChange':
+            onChange = value;
             break;
           default:
             console.error(`Invalide register key '${key}'`);

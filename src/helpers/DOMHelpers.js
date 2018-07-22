@@ -161,7 +161,7 @@ export const createNodeLabel = (content, store, id) => {
   element.lastChild.style.marginLeft = 'auto';
   element.lastChild.style.marginRight = 'auto';
 
-  element.lastChild.appendChild(createNodeTools(id, store));
+  if (store.editable) element.lastChild.appendChild(createNodeTools(id, store));
 
   return element;
 };
@@ -235,7 +235,7 @@ const collectInfo = (args) => {
     if (allowedTypes.includes(typeof defaultValues[key])) {
       const input = styled('input')(null, '_iTree_input_text', { id: `_iTree_input_${key}`, type: 'text', value: values[key] || '' });
       inputFields[key] = input;
-    }
+    };
   });
 
   const actionButtons = args.actions.map((action) => {
@@ -251,10 +251,12 @@ const collectInfo = (args) => {
     return btn;
   });
 
+
+
   const content = styled('div')([
     styled('span')(args.purpose === FLAGS.UPDATE ? ICONS.EDIT : ICONS.ADD, '_iTree_icon'),
     styled('div')(
-      Object.keys(inputFields).map(key => styled('div')([`${key}:<br/>`, inputFields[key]], '_iTree_input_field_container'))
+      (Object.keys(inputFields).length === 0) ? (FLAGS.UPDATE === args.purpose) ? '<br/>Nothing to update<br/><br/>' : '<br/>A new node will be added, no field required.<br/><br/>' : Object.keys(inputFields).map(key => styled('div')([`${key}:<br/>`, inputFields[key]], '_iTree_input_field_container'))
       , '_iTree_collect_info_body'),
     styled('div')(actionButtons, '_iTree_dialogue-actions'),
   ], '_iTree_centerContent');
@@ -276,7 +278,7 @@ export const createNodeTools = (id, store) => {
       text: "We are adding a new node!",
       actions: [
         [ACTIONS.CANCEL, (e) => { }, false],
-        [ACTIONS.ADD, (values) => { store.addNodeChild({ content: { values } }, e.target.dataset.nodeId, true); }, true],
+        [ACTIONS.ADD, (values) => { store.addNodeChild({ content: { values } }, e.target.dataset.nodeId, true); store.exportTree(); }, true],
       ],
       store,
       id,
@@ -294,6 +296,7 @@ export const createNodeTools = (id, store) => {
         [ACTIONS.CANCEL, (e) => { }, false],
         [ACTIONS.REMOVE, (e) => {
           store.removeNodeChild(id, true);
+          store.exportTree();
         }, true],
       ],
     });
@@ -314,7 +317,7 @@ export const createNodeTools = (id, store) => {
       text: "Editing the node!",
       actions: [
         [ACTIONS.CANCEL, (e) => { }, false],
-        [ACTIONS.UPDATE, (values) => { store.updateNodeValues(id, values); }, true],
+        [ACTIONS.UPDATE, (values) => { store.updateNodeValues(id, values); store.exportTree(); }, true],
       ],
       store,
       id,

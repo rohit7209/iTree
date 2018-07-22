@@ -12,9 +12,7 @@ export const camelToHyphenCase = (text) => {
   } else return;
 };
 
-
 export const beautifyTree = (nodeMap, nodeParentMap) => {
-
   const addToTree = (tree, node) => {
     if (nodeMap[node].node.content) tree.values = nodeMap[node].node.content.values || {};
     (nodeParentMap[node] || []).forEach(item => {
@@ -23,10 +21,6 @@ export const beautifyTree = (nodeMap, nodeParentMap) => {
     });
     return tree;
   };
-
   const tree = addToTree({}, nodeParentMap.root[0]);
-
-  console.log('tree::', tree);
-
   return tree;
 }

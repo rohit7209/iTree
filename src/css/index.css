@@ -1,9 +1,9 @@
 ._iTree_tools{
   font-size: 12px;
   font-weight: lighter;
-  color:rgb(200,200,200);
+  color:rgb(220,220,220);
   font-weight: bold;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.3);
   position: absolute !important;
   width: 100%;
   display: none;
@@ -268,4 +268,15 @@ header {
 ._iTree_collect_info_body{
   display:flex; 
   flex-wrap:wrap;
+}
+
+._iTree_default_node{
+  width:40px;
+  height:40px;
+  line-height: 40px;
+  border:1px solid rgb(55, 150, 198);
+  color: rgb(55, 150, 198);
+  background: rgba(55, 150, 198, 0.1);
+  border-radius:30px;
+  overflow:hidden;
 }
