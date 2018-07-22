@@ -6,7 +6,7 @@
   "scripts": {
     "test-build": "babel --presets es2015 spec/appSpec.js -o [name].bundle.js",
     "test": "babel-node ./spec/run.js",
-    "build": "WEBPACK_ENV=build webpack",
+    "build": "WEBPACK_ENV=build webpack --progress",
     "start": "WEBPACK_ENV=dev webpack-dev-server --host 0.0.0.0"
   },
   "author": "Rohit Sharma",

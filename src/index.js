@@ -32,8 +32,8 @@ export const paint = (store) => {
  * register entry function in window and instantiate a store for current object instance of iTree
  * user can instantiate multiple objects of iTree and all have their own store
  */
+// const window = window || {};
 ((window) => {
-  'use strict';
   window.iTree = function (container) {
     /**
      * 'store' manage (store and manipulate and provide) all the required information related to tree
@@ -68,6 +68,7 @@ export const paint = (store) => {
   };
 })(window);
 
+// export default window.iTree;
 /**
  * 
 const addNext = (props, id, position, store) => {

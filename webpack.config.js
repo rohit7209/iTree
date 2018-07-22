@@ -1,28 +1,39 @@
-var webpack = require('webpack');
-var path = require('path');
-var libraryName = 'iTree';
-var outputFile = libraryName + '.js';
+const webpack = require('webpack');
+const path = require('path');
+const libraryName = 'iTree';
+let outputFile = libraryName + '.js';
 
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-var env = process.env.WEBPACK_ENV;
+const uglifyJsWebpackPlugin = require("uglifyjs-webpack-plugin");
+const env = process.env.WEBPACK_ENV;
 
-var plugins = [], outputFile;
+const plugins = [];
 
+let watch = true;
 if (env === 'build') {
-  plugins.push(new UglifyJsPlugin());
+  watch = false;
+  plugins.push(new uglifyJsWebpackPlugin({
+    uglifyOptions: {
+      output: {
+        comments: false
+      },
+      compress: {
+        warnings: false,
+      },
+    },
+  }));
   outputFile = libraryName + '.min.js';
 } else {
   outputFile = libraryName + '.js';
 }
 
-var config = {
-  mode:'none',
+const config = {
+  mode: 'none',
   context: __dirname + '/src', // `__dirname` is root of project and `src` is source
   entry: {
     app: './index.js',
   },
   output: {
-    path: __dirname + '/lib',
+    path: __dirname + '/example',
     filename: outputFile,
   },
   module: {
@@ -49,7 +60,7 @@ var config = {
     ]
   },
   plugins: plugins,
-  watch: true,
+  watch,
 };
 
 module.exports = config;
